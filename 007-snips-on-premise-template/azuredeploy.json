@@ -320,8 +320,7 @@
               "enabled": true,
               "storageUri": "[reference(variables('diagStorageAccountName')).primaryEndpoints.blob]"
             }
-          },
-          "extensionProfile": "[if(parameters('provisionExtensions'), variables('extensionProfile'), json('null'))]"
+          }
         }
       }
     }
