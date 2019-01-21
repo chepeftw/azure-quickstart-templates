@@ -20,12 +20,6 @@
         "description": "Type of OS on the existing vhd"
       }
     },
-    "osDiskVhdUri": {
-      "type": "string",
-      "metadata": {
-        "description": "Uri of the existing VHD in ARM standard or premium storage"
-      }
-    },
     "vmSize": {
       "type": "string",
       "defaultValue": "Standard_D1_v3",
@@ -100,7 +94,9 @@
     "diagStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'specvm')]",
     "subnetRef": "[resourceGroup().id, 'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),  parameters('subnetName'))]",
     "nicName": "nic",
+    "instanceCount": "2",
     "publicIPAddressName": "publicIp",
+    "osDiskVhdUri": "https://storagesnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190114.vhd",
     "imageName": "[concat(parameters('vmName'), '-image')]",
     "linuxConfiguration": {
       "disablePasswordAuthentication": true,
@@ -201,7 +197,7 @@
           "osDisk": {
             "osType": "[parameters('osType')]",
             "osState": "Generalized",
-            "blobUri": "[parameters('osDiskVhdUri')]",
+            "blobUri": "[variables('osDiskVhdUri')]",
             "caching": "ReadWrite",
             "storageAccountType": "Standard_LRS"
           }
@@ -247,6 +243,80 @@
             "enabled": true,
             "storageUri": "[reference(variables('diagStorageAccountName')).primaryEndpoints.blob]"
           }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "name": "[concat(parameters('vmName'), '-scale-set')]",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2017-03-30",
+      "dependsOn": [],
+      "sku": {
+        "name": "[parameters('vmSize')]",
+        "tier": "Standard",
+        "capacity": "[variables('instanceCount')]"
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "upgradePolicy": {
+          "mode": "Manual"
+        },
+        "overprovision": true,
+        "virtualMachineProfile": {
+          "storageProfile": {
+            "osDisk": {
+              "caching": "ReadOnly",
+              "createOption": "FromImage"
+            },
+            "imageReference": {
+              "id": "[resourceId('Microsoft.Compute/images', variables('imageName'))]"
+            }
+          },
+          "osProfile": {
+            "computerNamePrefix": "snips",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPasswordorSSHKey')]",
+            "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+          },
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "[variables('nicName')]",
+                "properties": {
+                  "primary": true,
+                  "ipConfigurations": [
+                    {
+                      "name": "ipconfig1",
+                      "properties": {
+                        "subnet": {
+                          "id": "[variables('subnetRef')]"
+                        },
+                        "publicipaddressconfiguration": {
+                          "name": "publicip",
+                          "properties": {
+                            "idleTimeoutInMinutes": 15,
+                            "dnsSettings": {
+                              "domainNameLabel": "[concat(parameters('vmName'), '-scale-set')]"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "diagnosticsProfile": {
+            "bootDiagnostics": {
+              "enabled": true,
+              "storageUri": "[variables('diagStorageAccountName').primaryEndpoints.blob]"
+            }
+          },
+          "extensionProfile": "[if(parameters('provisionExtensions'), variables('extensionProfile'), json('null'))]"
         }
       }
     }
