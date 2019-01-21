@@ -12,10 +12,9 @@
     "osType": {
       "type": "string",
       "allowedValues": [
-        "Windows",
         "Linux"
       ],
-      "defaultValue": "Windows",
+      "defaultValue": "Linux",
       "metadata": {
         "description": "Type of OS on the existing vhd"
       }
@@ -319,7 +318,7 @@
           "diagnosticsProfile": {
             "bootDiagnostics": {
               "enabled": true,
-              "storageUri": "[variables('diagStorageAccountName').primaryEndpoints.blob]"
+              "storageUri": "[reference(variables('diagStorageAccountName')).primaryEndpoints.blob]"
             }
           },
           "extensionProfile": "[if(parameters('provisionExtensions'), variables('extensionProfile'), json('null'))]"
