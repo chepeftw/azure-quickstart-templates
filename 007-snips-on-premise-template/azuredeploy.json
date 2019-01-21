@@ -92,7 +92,7 @@
   },
   "variables": {
     "diagStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'specvm')]",
-    "subnetRef": "[resourceGroup().id, 'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),  parameters('subnetName'))]",
+    "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),  parameters('subnetName'))]",
     "nicName": "nic",
     "instanceCount": "2",
     "publicIPAddressName": "publicIp",
@@ -294,6 +294,7 @@
                         "subnet": {
                           "id": "[variables('subnetRef')]"
                         },
+                        "privateIPAllocationMethod": "Dynamic",
                         "publicipaddressconfiguration": {
                           "name": "publicip",
                           "properties": {
