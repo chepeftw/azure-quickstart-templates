@@ -22,7 +22,7 @@
     },
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_D1_v3",
+      "defaultValue": "Standard_DS1_v2",
       "metadata": {
         "description": "Size of the VM"
       },
@@ -315,14 +315,7 @@
                 }
               }
             ]
-          },
-          "diagnosticsProfile": {
-            "bootDiagnostics": {
-              "enabled": true,
-              "storageUri": "[variables('diagStorageAccountName').primaryEndpoints.blob]"
-            }
-          },
-          "extensionProfile": "[if(parameters('provisionExtensions'), variables('extensionProfile'), json('null'))]"
+          }
         }
       }
     }
