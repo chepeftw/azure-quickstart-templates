@@ -283,7 +283,7 @@
           "osProfile": {
             "computerNamePrefix": "snips",
             "adminUsername": "[parameters('adminUsername')]",
-            "adminPassword": "[parameters('adminPasswordorSSHKey')]",
+            "adminPassword": "[parameters('adminPasswordOrKey')]",
             "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
           },
           "networkProfile": {
@@ -315,7 +315,14 @@
                 }
               }
             ]
-          }
+          },
+          "diagnosticsProfile": {
+            "bootDiagnostics": {
+              "enabled": true,
+              "storageUri": "[variables('diagStorageAccountName').primaryEndpoints.blob]"
+            }
+          },
+          "extensionProfile": "[if(parameters('provisionExtensions'), variables('extensionProfile'), json('null'))]"
         }
       }
     }
