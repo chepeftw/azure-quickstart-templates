@@ -454,7 +454,16 @@
         "enabledForDiskEncryption": false,
         "enabledForTemplateDeployment": true,
         "tenantId": "[subscription().tenantId]",
-        "accessPolicies": [],
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]",
+            "permissions": {
+              "secrets": "[array('list', 'get')]"
+            }
+          }
+
+        ],
         "sku": {
           "name": "Standard",
           "family": "A"
