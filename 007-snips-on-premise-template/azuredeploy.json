@@ -94,7 +94,8 @@
   },
   "variables": {
     "diagStorageAccountName": "[concat(parameters('vmssName'), '-', uniquestring(resourceGroup().id), '-specvm')]",
-    "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),  parameters('subnetName'))]",
+    "virtualNetworkName": "[concat(parameters('vmssName'), '-vnet')]",
+    "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),  parameters('subnetName'))]",
 
     "lbName": "[concat(parameters('vmssName'), '-lb')]",
     "bepoolName": "[concat(variables('lbName'), '-bepool')]",
@@ -113,7 +114,6 @@
     "subnetPrefix": "10.0.0.0/24",
 
     "instanceCount": "2",
-    "virtualNetworkName": "[concat(parameters('vmssName'), '-vnet')]",
     "publicIPAddressName": "publicIp",
     "osDiskVhdUri": "https://storagesnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190114.vhd",
     "imageName": "[concat(parameters('vmssName'), '-image')]",
