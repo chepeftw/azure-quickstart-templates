@@ -2,11 +2,19 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "vmName": {
+    "vmssName": {
       "type": "string",
-      "defaultValue": "newvm",
+      "defaultValue": "newvmss",
       "metadata": {
-        "description": "Name of the VM"
+        "description": "Name of the Virtual Machine Scale Set"
+      },
+      "minLength": 3,
+      "maxLength": 61
+    },
+    "keyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Vault"
       }
     },
     "osType": {
@@ -38,24 +46,6 @@
         "Standard_D32s_v3"
       ]
     },
-    "vNetNewOrExisting": {
-      "type": "string",
-      "defaultValue": "new",
-      "allowedValues": [
-        "new",
-        "existing"
-      ],
-      "metadata": {
-        "description": "Specify whether to create a new or existing virtual network for the VM."
-      }
-    },
-    "virtualNetworkName": {
-      "type": "string",
-      "defaultValue": "newVnet",
-      "metadata": {
-        "description": "Name of the existing VNET"
-      }
-    },
     "subnetName": {
       "type": "string",
       "defaultValue": "subnet-1",
@@ -69,6 +59,14 @@
       "metadata": {
         "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
       }
+    },
+    "capacity": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of VM instances (20 or less)."
+      },
+      "defaultValue": 2,
+      "maxValue": 20
     },
     "adminUsername": {
       "type": "string",
@@ -95,13 +93,30 @@
     }
   },
   "variables": {
-    "diagStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'specvm')]",
+    "diagStorageAccountName": "[concat(parameters('vmssName'), '-', uniquestring(resourceGroup().id), '-specvm')]",
     "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),  parameters('subnetName'))]",
-    "nicName": "nic",
+
+    "lbName": "[concat(parameters('vmssName'), '-lb')]",
+    "bepoolName": "[concat(variables('lbName'), '-bepool')]",
+    "fepoolName": "[concat(variables('lbName'), '-fepool')]",
+    "feIpConfigName": "[concat(variables('fepoolName'), 'IpConfig')]",
+    "feIpConfigId": "[concat(variables('lbID'),'/frontendIPConfigurations/', variables('feIpConfigName'))]",
+    "bepoolID": "[concat(variables('lbID'),'/backendAddressPools/', variables('bepoolName'))]",
+    "natPoolName": "[concat(variables('lbName'), 'natpool')]",
+    "nicName": "[concat(parameters('vmssName'), 'nic')]",
+    "ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]",
+
+    "tcpProbeName": "tcpProbe",
+    "udpProbeName": "udpProbe",
+
+    "addressPrefix": "10.0.0.0/16",
+    "subnetPrefix": "10.0.0.0/24",
+
     "instanceCount": "2",
+    "virtualNetworkName": "[concat(parameters('vmssName'), '-vnet')]",
     "publicIPAddressName": "publicIp",
     "osDiskVhdUri": "https://storagesnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190114.vhd",
-    "imageName": "[concat(parameters('vmName'), '-image')]",
+    "imageName": "[concat(parameters('vmssName'), '-image')]",
     "linuxConfiguration": {
       "disablePasswordAuthentication": true,
       "ssh": {
@@ -116,40 +131,59 @@
   },
   "resources": [
     {
-      "condition": "[equals(parameters('vNetNewOrExisting'), 'new')]",
-      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('diagStorageAccountName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage",
+      "properties": {},
+      "apiVersion": "2018-02-01"
+    },
+
+    {
+      "type": "Microsoft.Compute/images",
+      "name": "[variables('imageName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "storageProfile": {
+          "osDisk": {
+            "osType": "Linux",
+            "osState": "Generalized",
+            "blobUri": "[variables('osDiskVhdUri')]",
+            "caching": "ReadWrite",
+            "storageAccountType": "Standard_LRS"
+          }
+        }
+      },
+      "apiVersion": "2018-04-01"
+    },
+
+
+    {
       "type": "Microsoft.Network/virtualNetworks",
-      "name": "[parameters('virtualNetworkName')]",
+      "name": "[variables('virtualNetworkName')]",
       "location": "[resourceGroup().location]",
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "10.0.0.0/16"
+            "[variables('addressPrefix')]"
           ]
         },
         "subnets": [
           {
             "name": "[parameters('subnetName')]",
             "properties": {
-              "addressPrefix": "10.0.0.0/24"
+              "addressPrefix": "[variables('subnetPrefix')]"
             }
           }
         ]
-      }
-    },
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('diagStorageAccountName')]",
-      "apiVersion": "2018-02-01",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "name": "Standard_LRS"
       },
-      "kind": "Storage",
-      "properties": {}
+      "apiVersion": "2015-06-15"
     },
+
     {
-      "apiVersion": "2018-04-01",
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('publicIPAddressName')]",
       "location": "[resourceGroup().location]",
@@ -161,129 +195,146 @@
         "dnsSettings": {
           "domainNameLabel": "[parameters('dnsNameForPublicIP')]"
         }
-      }
+      },
+      "apiVersion": "2018-04-01"
     },
+
+
+
     {
-      "apiVersion": "2018-04-01",
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[variables('nicName')]",
+      "type": "Microsoft.Network/loadBalancers",
+      "name": "[variables('lbName')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[variables('publicIPAddressName')]"
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
       ],
       "tags": {
-        "displayName": "NetworkInterface"
+        "displayName": "Load Balancer"
       },
       "properties": {
-        "ipConfigurations": [
+        "frontendIPConfigurations": [
           {
-            "name": "ipconfig1",
+            "name": "[variables('feIpConfigName')]",
             "properties": {
-              "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
-              },
-              "subnet": {
-                "id": "[variables('subnetRef')]"
               }
             }
           }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Compute/images",
-      "apiVersion": "2018-04-01",
-      "name": "[variables('imageName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "storageProfile": {
-          "osDisk": {
-            "osType": "[parameters('osType')]",
-            "osState": "Generalized",
-            "blobUri": "[variables('osDiskVhdUri')]",
-            "caching": "ReadWrite",
-            "storageAccountType": "Standard_LRS"
+        ],
+        "backendAddressPools": [
+          {
+            "name": "[variables('bepoolName')]"
           }
-        }
-      }
-    },
-    {
-      "apiVersion": "2018-04-01",
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('vmName')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "VirtualMachine"
-      },
-      "dependsOn": [
-        "[variables('nicName')]",
-        "[variables('imageName')]"
-      ],
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[parameters('vmSize')]"
-        },
-        "osProfile": {
-          "computerName": "[parameters('vmName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPasswordOrKey')]",
-          "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
-        },
-        "storageProfile": {
-          "imageReference": {
-              "id": "[resourceId('Microsoft.Compute/images', variables('imageName'))]"
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+        ],
+        "inboundNatPools": [
+          {
+            "name": "[variables('natPoolName')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('feIpConfigId')]"
+              },
+              "protocol": "tcp",
+              "frontendPortRangeStart": 9000,
+              "frontendPortRangeEnd": 9005,
+              "backendPort": 22
             }
-          ]
-        },
-        "diagnosticsProfile": {
-          "bootDiagnostics": {
-            "enabled": true,
-            "storageUri": "[reference(variables('diagStorageAccountName')).primaryEndpoints.blob]"
           }
-        }
-      }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "TCPRule",
+            "properties": {
+              "loadDistribution": "Default",
+              "frontendIPConfiguration": {
+                "id": "[variables('feIpConfigId')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('bepoolID')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 9000,
+              "backendPort": 9000,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '/probes/', variables('tcpProbeName'))]"
+              }
+            }
+          },
+          {
+            "name": "UDPRule",
+            "properties": {
+              "loadDistribution": "Default",
+              "frontendIPConfiguration": {
+                "id": "[variables('feIpConfigId')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('bepoolId')]"
+              },
+              "protocol": "Udp",
+              "frontendPort": 9000,
+              "backendPort": 9000,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '/probes/', variables('udpProbeName'))]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "[variables('tcpProbeName')]",
+            "properties": {
+              "protocol": "Tcp",
+              "port": 9000,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          },
+          {
+            "name": "[variables('udpProbeName')]",
+            "properties": {
+              "protocol": "Udp",
+              "port": 9000,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+      },
+      "apiVersion": "2016-03-30"
     },
+
+
     {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
-      "name": "[concat(parameters('vmName'), '-scale-set')]",
+      "name": "[parameters('vmssName')]",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2017-03-30",
-      "dependsOn": [],
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+        "[concat('Microsoft.Compute/images/', variables('imageName'))]"
+      ],
       "sku": {
         "name": "[parameters('vmSize')]",
         "tier": "Standard",
-        "capacity": "[variables('instanceCount')]"
-      },
-      "identity": {
-        "type": "SystemAssigned"
+        "capacity": "[parameters('capacity')]"
       },
       "properties": {
         "upgradePolicy": {
           "mode": "Manual"
         },
-        "overprovision": true,
         "virtualMachineProfile": {
           "storageProfile": {
-            "osDisk": {
-              "caching": "ReadOnly",
-              "createOption": "FromImage"
-            },
             "imageReference": {
               "id": "[resourceId('Microsoft.Compute/images', variables('imageName'))]"
             }
           },
           "osProfile": {
-            "computerNamePrefix": "snips",
+            "computerNamePrefix": "[parameters('vmssName')]",
             "adminUsername": "[parameters('adminUsername')]",
-            "adminPassword": "[parameters('adminPasswordOrKey')]",
-            "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+            "adminPassword": "[parameters('adminPassword')]"
           },
           "networkProfile": {
             "networkInterfaceConfigurations": [
@@ -293,21 +344,21 @@
                   "primary": true,
                   "ipConfigurations": [
                     {
-                      "name": "ipconfig1",
+                      "name": "[variables('ipConfigName')]",
                       "properties": {
                         "subnet": {
-                          "id": "[variables('subnetRef')]"
+                          "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName')), '/subnets/', variables('subnetName'))]"
                         },
-                        "privateIPAllocationMethod": "Dynamic",
-                        "publicipaddressconfiguration": {
-                          "name": "publicip",
-                          "properties": {
-                            "idleTimeoutInMinutes": 15,
-                            "dnsSettings": {
-                              "domainNameLabel": "[concat(parameters('vmName'), '-scale-set')]"
-                            }
+                        "loadBalancerBackendAddressPools": [
+                          {
+                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('lbName'), '/backendAddressPools/', variables('bePoolName'))]"
                           }
-                        }
+                        ],
+                        "loadBalancerInboundNatPools": [
+                          {
+                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('lbName'), '/inboundNatPools/', variables('natPoolName'))]"
+                          }
+                        ]
                       }
                     }
                   ]
@@ -315,14 +366,111 @@
               }
             ]
           },
-          "diagnosticsProfile": {
-            "bootDiagnostics": {
-              "enabled": true,
-              "storageUri": "[reference(variables('diagStorageAccountName')).primaryEndpoints.blob]"
-            }
+          "extensionProfile": {
+            "extensions": [
+              {
+                "name": "updatescriptextension",
+                "properties": {
+                  "publisher": "Microsoft.Azure.Extensions",
+                  "type": "CustomScript",
+                  "typeHandlerVersion": "2.0",
+                  "autoUpgradeMinorVersion": true,
+                  "settings": {
+                    "fileUris": [],
+                    "commandToExecute": "echo 'ping' > /var/tmp/ping'"
+                  }
+                }
+              }
+            ]
           }
         }
-      }
+      },
+      "apiVersion": "2017-03-30"
+    },
+
+
+    {
+      "type": "Microsoft.Insights/autoscaleSettings",
+      "name": "autoscalesettings",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
+      ],
+      "properties": {
+        "name": "autoscalesettings",
+        "targetResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]",
+        "enabled": true,
+        "profiles": [
+          {
+            "name": "Profile1",
+            "capacity": {
+              "minimum": "2",
+              "maximum": "20",
+              "default": "[parameters('capacity')]"
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "Percentage CPU",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT5M",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": 40.0
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": "1",
+                  "cooldown": "PT1M"
+                }
+              },
+              {
+                "metricTrigger": {
+                  "metricName": "Percentage CPU",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/',parameters('vmssName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT5M",
+                  "timeAggregation": "Average",
+                  "operator": "LessThan",
+                  "threshold": 30.0
+                },
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": "1",
+                  "cooldown": "PT5M"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "apiVersion": "2015-04-01"
+    },
+
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "name": "[parameters('keyVaultName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "enabledForDeployment": true,
+        "enabledForDiskEncryption": false,
+        "enabledForTemplateDeployment": true,
+        "tenantId": "[parameters('tenantId')]",
+
+        "sku": {
+          "name": "Standard",
+          "family": "A"
+        }
+      },
+      "apiVersion": "2016-10-01"
     }
+
   ]
 }
