@@ -311,8 +311,7 @@
         "capacity": "[parameters('capacity')]"
       },
       "identity": {
-        "type": "SystemAssigned",
-        "userAssignedIdentities": {}
+        "type": "SystemAssigned"
       },
       "properties": {
         "upgradePolicy": {
@@ -456,8 +455,15 @@
         "enabledForDiskEncryption": false,
         "enabledForTemplateDeployment": true,
         "tenantId": "[subscription().tenantId]",
-        "objectId": "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]",
-
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]",
+            "permissions": {
+              "secrets": "['list', 'get']"
+            }
+          }
+        ],
         "sku": {
           "name": "Standard",
           "family": "A"
