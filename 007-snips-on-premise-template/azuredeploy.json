@@ -94,7 +94,7 @@
     }
   },
   "variables": {
-    "diagStorageAccountName": "[concat(parameters('vmssName'), '-', uniquestring(resourceGroup().id), '-specvm')]",
+    "diagStorageAccountName": "[concat(uniquestring(resourceGroup().id), '-strg')]",
     "virtualNetworkName": "[concat(parameters('vmssName'), '-vnet')]",
     "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),  parameters('subnetName'))]",
 
@@ -290,15 +290,6 @@
             "name": "[variables('tcpProbeName')]",
             "properties": {
               "protocol": "Tcp",
-              "port": 9000,
-              "intervalInSeconds": 5,
-              "numberOfProbes": 2
-            }
-          },
-          {
-            "name": "[variables('udpProbeName')]",
-            "properties": {
-              "protocol": "Udp",
               "port": 9000,
               "intervalInSeconds": 5,
               "numberOfProbes": 2
