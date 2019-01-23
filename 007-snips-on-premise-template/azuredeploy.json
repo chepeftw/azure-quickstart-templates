@@ -449,6 +449,9 @@
       "type": "Microsoft.KeyVault/vaults",
       "name": "[parameters('keyVaultName')]",
       "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
+      ],
       "properties": {
         "enabledForDeployment": true,
         "enabledForDiskEncryption": false,
