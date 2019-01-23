@@ -459,7 +459,7 @@
             "tenantId": "[subscription().tenantId]",
             "objectId": "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]",
             "permissions": {
-              "secrets": "[split('list, get', ',')]"
+              "secrets": "[array('all')]"
             }
           }
         ],
