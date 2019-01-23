@@ -98,6 +98,7 @@
     "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),  parameters('subnetName'))]",
 
     "lbName": "[concat(parameters('vmssName'), '-lb')]",
+    "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
     "bepoolName": "[concat(variables('lbName'), '-bepool')]",
     "fepoolName": "[concat(variables('lbName'), '-fepool')]",
     "feIpConfigName": "[concat(variables('fepoolName'), 'IpConfig')]",
