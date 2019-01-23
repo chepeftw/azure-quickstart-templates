@@ -323,7 +323,7 @@
           "osProfile": {
             "computerNamePrefix": "[parameters('vmssName')]",
             "adminUsername": "[parameters('adminUsername')]",
-            "adminPassword": "[parameters('adminPassword')]"
+            "adminPassword": "[parameters('adminPasswordOrKey')]"
           },
           "networkProfile": {
             "networkInterfaceConfigurations": [
@@ -451,7 +451,7 @@
         "enabledForDeployment": true,
         "enabledForDiskEncryption": false,
         "enabledForTemplateDeployment": true,
-        "tenantId": "[parameters('tenantId')]",
+        "tenantId": "[subscription().tenantId]",
 
         "sku": {
           "name": "Standard",
