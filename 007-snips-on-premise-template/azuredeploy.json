@@ -368,8 +368,7 @@
                   "typeHandlerVersion": "2.0",
                   "autoUpgradeMinorVersion": true,
                   "settings": {
-                    "fileUris": [],
-                    "commandToExecute": "echo 'ping' > /var/tmp/ping'"
+                    "commandToExecute": "echo 'ping'"
                   }
                 }
               }
