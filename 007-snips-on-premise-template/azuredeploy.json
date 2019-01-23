@@ -450,19 +450,7 @@
       "name": "[parameters('keyVaultName')]",
       "location": "[resourceGroup().location]",
       "properties": {
-        "enabledForDeployment": true,
-        "enabledForDiskEncryption": false,
-        "enabledForTemplateDeployment": true,
         "tenantId": "[subscription().tenantId]",
-        "accessPolicies": [
-          {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]",
-            "permissions": {
-              "secrets": "[array('all')]"
-            }
-          }
-        ],
         "sku": {
           "name": "Standard",
           "family": "A"
