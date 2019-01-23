@@ -310,6 +310,10 @@
         "tier": "Standard",
         "capacity": "[parameters('capacity')]"
       },
+      "identity": {
+        "type": "SystemAssigned",
+        "userAssignedIdentities": {}
+      },
       "properties": {
         "upgradePolicy": {
           "mode": "Manual"
@@ -336,7 +340,7 @@
                       "name": "[variables('ipConfigName')]",
                       "properties": {
                         "subnet": {
-                          "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName')), '/subnets/', variables('subnetName'))]"
+                          "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName')), '/subnets/', parameters('subnetName'))]"
                         },
                         "loadBalancerBackendAddressPools": [
                           {
@@ -452,6 +456,7 @@
         "enabledForDiskEncryption": false,
         "enabledForTemplateDeployment": true,
         "tenantId": "[subscription().tenantId]",
+        "objectId": "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]",
 
         "sku": {
           "name": "Standard",
