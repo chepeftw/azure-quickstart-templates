@@ -4,7 +4,7 @@
   "parameters": {
     "vmssName": {
       "type": "string",
-      "defaultValue": "newvmss",
+      "defaultValue": "new-vmss-snips",
       "metadata": {
         "description": "Name of the Virtual Machine Scale Set"
       },
@@ -13,6 +13,7 @@
     },
     "keyVaultName": {
       "type": "string",
+      "defaultValue": "new-keyvault-snips-01",
       "metadata": {
         "description": "Name of the Vault"
       }
@@ -55,7 +56,7 @@
     },
     "dnsNameForPublicIP": {
       "type": "string",
-      "defaultValue": "[concat('vm-', uniqueString(resourceGroup().id))]",
+      "defaultValue": "new-vmss-snips-dns",
       "metadata": {
         "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
       }
