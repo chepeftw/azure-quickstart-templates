@@ -94,7 +94,7 @@
     }
   },
   "variables": {
-    "diagStorageAccountName": "[concat(uniquestring(resourceGroup().id), '-strg')]",
+    "diagStorageAccountName": "[concat('strg', uniquestring(resourceGroup().id))]",
     "virtualNetworkName": "[concat(parameters('vmssName'), '-vnet')]",
     "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),  parameters('subnetName'))]",
 
@@ -110,7 +110,6 @@
     "ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]",
 
     "tcpProbeName": "tcpProbe",
-    "udpProbeName": "udpProbe",
 
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefix": "10.0.0.0/24",
@@ -278,10 +277,7 @@
               "frontendPort": 9000,
               "backendPort": 9000,
               "enableFloatingIP": false,
-              "idleTimeoutInMinutes": 5,
-              "probe": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '/probes/', variables('udpProbeName'))]"
-              }
+              "idleTimeoutInMinutes": 5
             }
           }
         ],
