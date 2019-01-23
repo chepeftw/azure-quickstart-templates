@@ -236,8 +236,8 @@
                 "id": "[variables('feIpConfigId')]"
               },
               "protocol": "tcp",
-              "frontendPortRangeStart": 9000,
-              "frontendPortRangeEnd": 9005,
+              "frontendPortRangeStart": 10022,
+              "frontendPortRangeEnd": 11022,
               "backendPort": 22
             }
           }
@@ -460,7 +460,7 @@
             "tenantId": "[subscription().tenantId]",
             "objectId": "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]",
             "permissions": {
-              "secrets": "list, get"
+              "secrets": "[list, get]"
             }
           }
         ],
