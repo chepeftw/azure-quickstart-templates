@@ -450,7 +450,11 @@
       "name": "[parameters('keyVaultName')]",
       "location": "[resourceGroup().location]",
       "properties": {
+        "enabledForDeployment": true,
+        "enabledForDiskEncryption": false,
+        "enabledForTemplateDeployment": true,
         "tenantId": "[subscription().tenantId]",
+        "accessPolicies": [],
         "sku": {
           "name": "Standard",
           "family": "A"
