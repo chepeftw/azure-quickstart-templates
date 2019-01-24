@@ -375,13 +375,13 @@
     },
     {
       "type": "Microsoft.Insights/autoscaleSettings",
-      "name": "autoscalesettings",
+      "name": "[concat('autoscalesettings-',parameters('vmssName'))]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
       ],
       "properties": {
-        "name": "autoscalesettings",
+        "name": "[concat('autoscalesettings-',parameters('vmssName'))]",
         "targetResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]",
         "enabled": true,
         "profiles": [
