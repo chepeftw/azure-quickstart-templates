@@ -444,7 +444,7 @@
         "accessPolicies": [
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName')).objectId]",
+            "objectId": "[reference(resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))).objectId]",
             "permissions": {
               "secrets": [
                 "Get",
