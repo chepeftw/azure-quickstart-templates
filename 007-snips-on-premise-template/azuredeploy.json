@@ -293,7 +293,7 @@
           }
         ]
       },
-      "apiVersion": "2016-03-30"
+      "apiVersion": "2018-08-01"
     },
     {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
