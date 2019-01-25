@@ -191,6 +191,9 @@
       "tags": {
         "displayName": "PublicIPAddress"
       },
+      "sku": {
+        "name": "Standard"
+      },
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
         "dnsSettings": {
