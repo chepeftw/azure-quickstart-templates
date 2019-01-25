@@ -209,6 +209,9 @@
       "tags": {
         "displayName": "Load Balancer"
       },
+      "sku": {
+        "name": "Standard"
+      },
       "properties": {
         "frontendIPConfigurations": [
           {
