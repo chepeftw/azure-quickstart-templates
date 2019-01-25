@@ -304,7 +304,8 @@
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Compute/images/', variables('imageName'))]"
+        "[concat('Microsoft.Compute/images/', variables('imageName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
       ],
       "sku": {
         "name": "[parameters('vmSize')]",
