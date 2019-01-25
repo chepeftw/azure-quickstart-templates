@@ -119,7 +119,7 @@
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefix": "10.0.0.0/24",
     "instanceCount": "2",
-    "publicIPAddressName": "publicIp",
+    "publicIPAddressName": "[concat(parameters('vmssName'), '-publicIp')]",
     "osDiskVhdUri": "https://storagesnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190114.vhd",
     "imageName": "[concat(parameters('vmssName'), '-image')]",
     "linuxConfiguration": {
