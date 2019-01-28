@@ -186,7 +186,39 @@
           {
             "name": "[parameters('subnetName')]",
             "properties": {
-              "addressPrefix": "[variables('subnetPrefix')]"
+              "addressPrefix": "[variables('subnetPrefix')]",
+              "networkSecurityGroup": {
+                "properties": {
+                  "securityRules": [
+                    {
+                      "name": "[concat('nsg1-', parameters('vmssName'))]",
+                      "properties": {
+                        "protocol": "tcp",
+                        "sourcePortRange": "*",
+                        "destinationPortRange": "22",
+                        "sourceAddressPrefix": "*",
+                        "destinationAddressPrefix": "*",
+                        "access": "allow",
+                        "priority": "200",
+                        "direction": "inbound"
+                      }
+                    },
+                    {
+                      "name": "[concat('nsg2-', parameters('vmssName'))]",
+                      "properties": {
+                        "protocol": "tcp",
+                        "sourcePortRange": "*",
+                        "destinationPortRange": "9000",
+                        "sourceAddressPrefix": "*",
+                        "destinationAddressPrefix": "*",
+                        "access": "allow",
+                        "priority": "200",
+                        "direction": "inbound"
+                      }
+                    }
+                  ]
+                }
+              }
             }
           }
         ]
