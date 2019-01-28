@@ -258,40 +258,22 @@
         ],
         "loadBalancingRules": [
           {
-            "name": "TCPRule",
+            "name": "SnipsRule",
             "properties": {
-              "loadDistribution": "Default",
               "frontendIPConfiguration": {
                 "id": "[variables('feIpConfigId')]"
               },
               "backendAddressPool": {
                 "id": "[variables('bepoolID')]"
               },
-              "protocol": "Tcp",
+              "protocol": "All",
               "frontendPort": 9000,
               "backendPort": 9000,
               "enableFloatingIP": false,
-              "idleTimeoutInMinutes": 5,
+              "idleTimeoutInMinutes": 4,
               "probe": {
                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '/probes/', variables('tcpProbeName'))]"
               }
-            }
-          },
-          {
-            "name": "UDPRule",
-            "properties": {
-              "loadDistribution": "Default",
-              "frontendIPConfiguration": {
-                "id": "[variables('feIpConfigId')]"
-              },
-              "backendAddressPool": {
-                "id": "[variables('bepoolId')]"
-              },
-              "protocol": "Udp",
-              "frontendPort": 9000,
-              "backendPort": 9000,
-              "enableFloatingIP": false,
-              "idleTimeoutInMinutes": 5
             }
           }
         ],
