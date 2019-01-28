@@ -266,7 +266,7 @@
               "backendAddressPool": {
                 "id": "[variables('bepoolID')]"
               },
-              "protocol": "All",
+              "protocol": "Tcp",
               "frontendPort": 9000,
               "backendPort": 9000,
               "enableFloatingIP": false,
