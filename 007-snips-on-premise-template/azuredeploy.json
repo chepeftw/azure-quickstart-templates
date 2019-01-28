@@ -491,5 +491,11 @@
       ],
       "apiVersion": "2015-06-01"
     }
-  ]
+  ],
+  "outputs": {
+    "loadBalancerPublicIPAddress": {
+      "type": "string",
+      "value": "[reference(variables('lbName')).ipAddress]"
+    }
+  }
 }
