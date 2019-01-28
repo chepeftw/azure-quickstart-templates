@@ -139,6 +139,9 @@
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('diagStorageAccountName')]",
       "location": "[resourceGroup().location]",
+      "tags": {
+        "snipsType": "testing"
+      },
       "sku": {
         "name": "Standard_LRS"
       },
@@ -150,6 +153,9 @@
       "type": "Microsoft.Compute/images",
       "name": "[variables('imageName')]",
       "location": "[resourceGroup().location]",
+      "tags": {
+        "snipsType": "testing"
+      },
       "properties": {
         "storageProfile": {
           "osDisk": {
@@ -167,6 +173,9 @@
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('virtualNetworkName')]",
       "location": "[resourceGroup().location]",
+      "tags": {
+        "snipsType": "testing"
+      },
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
@@ -189,7 +198,8 @@
       "name": "[variables('publicIPAddressName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "PublicIPAddress"
+        "displayName": "Public IP Address",
+        "snipsType": "testing"
       },
       "sku": {
         "name": "Standard"
@@ -210,7 +220,8 @@
         "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
       ],
       "tags": {
-        "displayName": "Load Balancer"
+        "displayName": "Load Balancer",
+        "snipsType": "testing"
       },
       "sku": {
         "name": "Standard"
@@ -302,6 +313,9 @@
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "name": "[parameters('vmssName')]",
       "location": "[resourceGroup().location]",
+      "tags": {
+        "snipsType": "testing"
+      },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Compute/images/', variables('imageName'))]",
@@ -384,6 +398,9 @@
       "type": "Microsoft.Insights/autoscaleSettings",
       "name": "[concat('autoscalesettings-',parameters('vmssName'))]",
       "location": "[resourceGroup().location]",
+      "tags": {
+        "snipsType": "testing"
+      },
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
       ],
@@ -448,6 +465,9 @@
       "type": "Microsoft.KeyVault/vaults",
       "name": "[parameters('keyVaultName')]",
       "location": "[resourceGroup().location]",
+      "tags": {
+        "snipsType": "testing"
+      },
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
       ],
@@ -478,6 +498,9 @@
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
       "name": "[concat(parameters('keyVaultName'), '/', variables('vaultSecretTokenName'))]",
+      "tags": {
+        "snipsType": "testing"
+      },
       "properties": {
         "value": "[parameters('vaultSecretTokenValue')]"
       },
