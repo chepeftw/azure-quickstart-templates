@@ -170,12 +170,54 @@
       "apiVersion": "2018-04-01"
     },
     {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[concat('nsg-', parameters('vmssName'))]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "snipsType": "testing"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "allow-ssh-traffic",
+            "properties": {
+              "protocol": "tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "allow",
+              "priority": 1000,
+              "direction": "inbound"
+            }
+          },
+          {
+            "name": "allow-snips-traffic",
+            "properties": {
+              "protocol": "tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "9000",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "allow",
+              "priority": 1020,
+              "direction": "inbound"
+            }
+          }
+        ]
+      },
+      "apiVersion": "2018-07-01"
+    },
+    {
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('virtualNetworkName')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "snipsType": "testing"
       },
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', 'nsg-', parameters('vmssName'))]"
+      ],
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
@@ -184,40 +226,12 @@
         },
         "subnets": [
           {
+            "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName')), '/subnets/', parameters('subnetName'))]",
             "name": "[parameters('subnetName')]",
             "properties": {
               "addressPrefix": "[variables('subnetPrefix')]",
               "networkSecurityGroup": {
-                "properties": {
-                  "securityRules": [
-                    {
-                      "name": "[concat('nsg1-', parameters('vmssName'))]",
-                      "properties": {
-                        "protocol": "tcp",
-                        "sourcePortRange": "*",
-                        "destinationPortRange": "22",
-                        "sourceAddressPrefix": "*",
-                        "destinationAddressPrefix": "*",
-                        "access": "allow",
-                        "priority": "200",
-                        "direction": "inbound"
-                      }
-                    },
-                    {
-                      "name": "[concat('nsg2-', parameters('vmssName'))]",
-                      "properties": {
-                        "protocol": "tcp",
-                        "sourcePortRange": "*",
-                        "destinationPortRange": "9000",
-                        "sourceAddressPrefix": "*",
-                        "destinationAddressPrefix": "*",
-                        "access": "allow",
-                        "priority": "200",
-                        "direction": "inbound"
-                      }
-                    }
-                  ]
-                }
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', 'nsg-', parameters('vmssName'))]"
               }
             }
           }
