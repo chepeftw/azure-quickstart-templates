@@ -231,7 +231,7 @@
             "properties": {
               "addressPrefix": "[variables('subnetPrefix')]",
               "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', 'nsg-', parameters('vmssName'))]"
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-', parameters('vmssName'))]"
               }
             }
           }
