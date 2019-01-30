@@ -407,7 +407,7 @@
                   "typeHandlerVersion": "2.0",
                   "autoUpgradeMinorVersion": true,
                   "settings": {
-                    "commandToExecute": "echo \"[parameters('keyVaultName')]\" > /tmp/vaultname.txt"
+                    "commandToExecute": "[concat('echo ', parameters('keyVaultName'), ' > /tmp/vaultname.txt')]"
                   }
                 }
               }
