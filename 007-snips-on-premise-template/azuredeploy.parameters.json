@@ -2,20 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vNetNewOrExisting": {
-            "value": "existing"
+        "vmssName": {
+            "value": "GEN-VMSS-NAME"
         },
-        "virtualNetworkName": {
-            "value": "GEN-VNET-NAME"
-        },
-        "virtualNetworkResourceGroup": {
-            "value": "GEN-VNET-RESOURCEGROUP-NAME"
+        "keyVaultName": {
+            "value": "GEN-UNIQUE"
         },
         "subnetName": {
             "value": "GEN-VNET-SUBNET1-NAME"
         },
-        "osDiskVhdUri": {
-            "value": "GEN-GENERALIZED-WINVHD-URI"
+        "dnsNameForPublicIP": {
+            "value": "GEN-UNIQUE"
         },
         "adminUsername": {
             "value": "GEN-UNIQUE"

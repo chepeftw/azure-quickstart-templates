@@ -6,7 +6,7 @@
       "type": "string",
       "defaultValue": "new-vmss-snips",
       "metadata": {
-        "description": "Name of the Virtual Machine Scale Set"
+        "description": "Name of the Virtual Machine Scale Set (VMSS)."
       },
       "minLength": 3,
       "maxLength": 61
@@ -15,14 +15,14 @@
       "type": "string",
       "defaultValue": "new-keyvault-snips-01",
       "metadata": {
-        "description": "Name of the Vault"
+        "description": "Name of the Vault."
       }
     },
     "vmSize": {
       "type": "string",
       "defaultValue": "Standard_DS1_v2",
       "metadata": {
-        "description": "Size of the VM"
+        "description": "Size of the virtual machines inside the VMSS."
       },
       "allowedValues": [
         "Standard_DS1_v2",
@@ -41,14 +41,14 @@
       "type": "string",
       "defaultValue": "subnet-1",
       "metadata": {
-        "description": "Name of the subnet in the virtual network you want to use"
+        "description": "Name of the subnet in the virtual network you want to use."
       }
     },
     "dnsNameForPublicIP": {
       "type": "string",
       "defaultValue": "new-vmss-snips-dns",
       "metadata": {
-        "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
+        "description": "Unique DNS Name for the Public IP used to access the load balancer."
       }
     },
     "capacity": {
@@ -69,7 +69,7 @@
     "adminUsername": {
       "type": "string",
       "metadata": {
-        "description": "User name for the Virtual Machine."
+        "description": "User name for the Virtual Machines."
       }
     },
     "authenticationType": {
@@ -130,7 +130,8 @@
       "name": "[variables('diagStorageAccountName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "snipsType": "testing"
+        "environment": "testing",
+        "displayName": "Snips Storage Account"
       },
       "sku": {
         "name": "Standard_LRS"
@@ -144,7 +145,8 @@
       "name": "[variables('imageName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "snipsType": "testing"
+        "environment": "testing",
+        "displayName": "Linux Base Image"
       },
       "properties": {
         "storageProfile": {
@@ -164,7 +166,8 @@
       "name": "[concat('nsg-', parameters('vmssName'))]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "snipsType": "testing"
+        "environment": "testing",
+        "displayName": "Snips Network Security Group"
       },
       "properties": {
         "securityRules": [
@@ -203,7 +206,8 @@
       "name": "[variables('virtualNetworkName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "snipsType": "testing"
+        "environment": "testing",
+        "displayName": "Snips Virtual Network"
       },
       "dependsOn": [
         "[concat('Microsoft.Network/networkSecurityGroups/', 'nsg-', parameters('vmssName'))]"
@@ -234,8 +238,8 @@
       "name": "[variables('publicIPAddressName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "Public IP Address",
-        "snipsType": "testing"
+        "environment": "testing",
+        "displayName": "Snips Public IP Address"
       },
       "sku": {
         "name": "Standard"
@@ -256,8 +260,8 @@
         "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
       ],
       "tags": {
-        "displayName": "Load Balancer",
-        "snipsType": "testing"
+        "environment": "testing",
+        "displayName": "Snips VMSS Load Balancer"
       },
       "sku": {
         "name": "Standard"
@@ -332,7 +336,8 @@
       "name": "[parameters('vmssName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "snipsType": "testing"
+        "environment": "testing",
+        "displayName": "Snips Virtual Machine Scale Set"
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
@@ -417,7 +422,8 @@
       "name": "[concat('autoscalesettings-',parameters('vmssName'))]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "snipsType": "testing"
+        "environment": "testing",
+        "displayName": "Snips VMSS Autoscale Settings"
       },
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
@@ -484,7 +490,8 @@
       "name": "[parameters('keyVaultName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "snipsType": "testing"
+        "environment": "testing",
+        "displayName": "Snips Vault"
       },
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
@@ -517,7 +524,7 @@
       "type": "Microsoft.KeyVault/vaults/secrets",
       "name": "[concat(parameters('keyVaultName'), '/', variables('vaultSecretTokenName'))]",
       "tags": {
-        "snipsType": "testing"
+        "environment": "testing"
       },
       "properties": {
         "value": "[parameters('vaultSecretTokenValue')]"
