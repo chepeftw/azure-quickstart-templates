@@ -407,7 +407,7 @@
                   "typeHandlerVersion": "2.0",
                   "autoUpgradeMinorVersion": true,
                   "settings": {
-                    "commandToExecute": "echo 'ping'"
+                    "commandToExecute": "echo \"[parameters('keyVaultName')]\" > /tmp/vaultname.txt"
                   }
                 }
               }
@@ -535,10 +535,5 @@
       "apiVersion": "2015-06-01"
     }
   ],
-  "outputs": {
-    "loadBalancerPublicIPAddress": {
-      "type": "string",
-      "value": "[reference(variables('lbName')).ipAddress]"
-    }
-  }
+  "outputs": {}
 }
