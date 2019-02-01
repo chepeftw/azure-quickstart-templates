@@ -66,6 +66,13 @@
         "description": "The token provided by Snips through the Snips console."
       }
     },
+    "vaultSecretMagicNumberValue": {
+      "type": "string",
+      "defaultValue": "4",
+      "metadata": {
+        "description": "This is not for the final solution, but only for debugging and benchmarking purposes. As the names implies ... it is the magic number!"
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -93,6 +100,7 @@
   "variables": {
     "diagStorageAccountName": "[concat('strg', uniquestring(resourceGroup().id))]",
     "vaultSecretTokenName": "AppToken",
+    "vaultSecretMagicNumberName": "AppMagicNumber",
     "virtualNetworkName": "[concat(parameters('vmssName'), '-vnet')]",
     "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),  parameters('subnetName'))]",
     "lbName": "[concat(parameters('vmssName'), '-lb')]",
@@ -528,6 +536,20 @@
       },
       "properties": {
         "value": "[parameters('vaultSecretTokenValue')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+      ],
+      "apiVersion": "2015-06-01"
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(parameters('keyVaultName'), '/', variables('vaultSecretMagicNumberName'))]",
+      "tags": {
+        "environment": "testing"
+      },
+      "properties": {
+        "value": "[parameters('vaultSecretMagicNumberValue')]"
       },
       "dependsOn": [
         "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
