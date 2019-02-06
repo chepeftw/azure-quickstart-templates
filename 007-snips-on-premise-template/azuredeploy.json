@@ -37,13 +37,6 @@
         "Standard_D32s_v3"
       ]
     },
-    "subnetName": {
-      "type": "string",
-      "defaultValue": "subnet-1",
-      "metadata": {
-        "description": "Name of the subnet in the virtual network you want to use."
-      }
-    },
     "dnsNameForPublicIP": {
       "type": "string",
       "defaultValue": "new-vmss-snips-dns",
@@ -101,8 +94,9 @@
     "diagStorageAccountName": "[concat('strg', uniquestring(resourceGroup().id))]",
     "vaultSecretTokenName": "AppToken",
     "vaultSecretMagicNumberName": "AppMagicNumber",
+    "subnetName": "subnet-1",
     "virtualNetworkName": "[concat(parameters('vmssName'), '-vnet')]",
-    "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),  parameters('subnetName'))]",
+    "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),  variables('subnetName'))]",
     "lbName": "[concat(parameters('vmssName'), '-lb')]",
     "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
     "bepoolName": "[concat(variables('lbName'), '-bepool')]",
@@ -113,7 +107,7 @@
     "natPoolName": "[concat(variables('lbName'), 'natpool')]",
     "nicName": "[concat(parameters('vmssName'), 'nic')]",
     "ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]",
-    "tcpProbeName": "tcpProbe",
+    "probeName": "internalHealthCheck",
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefix": "10.0.0.0/24",
     "instanceCount": "2",
@@ -228,8 +222,8 @@
         },
         "subnets": [
           {
-            "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName')), '/subnets/', parameters('subnetName'))]",
-            "name": "[parameters('subnetName')]",
+            "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName')), '/subnets/', variables('subnetName'))]",
+            "name": "[variables('subnetName')]",
             "properties": {
               "addressPrefix": "[variables('subnetPrefix')]",
               "networkSecurityGroup": {
@@ -315,24 +309,25 @@
                 "id": "[variables('bepoolID')]"
               },
               "protocol": "Tcp",
-              "frontendPort": 9000,
+              "frontendPort": 80,
               "backendPort": 9000,
               "enableFloatingIP": false,
               "idleTimeoutInMinutes": 4,
               "probe": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '/probes/', variables('tcpProbeName'))]"
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '/probes/', variables('probeName'))]"
               }
             }
           }
         ],
         "probes": [
           {
-            "name": "[variables('tcpProbeName')]",
+            "name": "[variables('probeName')]",
             "properties": {
-              "protocol": "Tcp",
+              "protocol": "Http",
               "port": 9000,
               "intervalInSeconds": 5,
-              "numberOfProbes": 2
+              "numberOfProbes": 2,
+              "requestPath": "/internal/hc"
             }
           }
         ]
@@ -386,7 +381,7 @@
                       "name": "[variables('ipConfigName')]",
                       "properties": {
                         "subnet": {
-                          "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName')), '/subnets/', parameters('subnetName'))]"
+                          "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName')), '/subnets/', variables('subnetName'))]"
                         },
                         "loadBalancerBackendAddressPools": [
                           {
