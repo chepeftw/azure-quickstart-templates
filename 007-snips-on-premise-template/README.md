@@ -40,7 +40,7 @@ This comes from a generalized VHD which runs all the required software to run th
 These are the network resources required for our solution. 
 We use a [Standard Load Balancer](https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-standard-overview) which allows scalable, robust and solid load balancing.
 This relies on a Fixed Public IP Address to access the Load Balancer.
-On the internal side, the load balancer relies on the Virtual Network, which provides an internal subnet with a network prefix of 10.0.0.0/24 where all instances will be connected.
+On the internal side, the [load balancer](https://docs.microsoft.com/en-us/azure/templates/microsoft.network/2018-08-01/loadbalancers) relies on the Virtual Network, which provides an internal subnet with a network prefix of 10.0.0.0/24 where all instances will be connected.
 As well, this Virtual Network contains the proper Network Security Group which allows traffic for SSH (port 22) and for Snips traffic (port 9000) for protocol TCP.
 **Important:** The load balancer will not work if it does not have the proper security group rules.
 
@@ -63,3 +63,9 @@ To allow the instances to pull the proper Snips assistant, it relies on a token.
 This token can be generated from the [Snips Console](https://console.snips.ai/).
 Then you can enter the token when creating the deployment in Azure or later through the Azure Vault.
 To properly add you token after the deployment, keep in mind that you first have to give your user access to the vault itself.
+
+## Useful References
+
+- [Application Offer](https://docs.microsoft.com/en-gb/azure/marketplace/cloud-partner-portal/azure-applications/cpp-azure-app-offer)
+- [Template Tutorials](https://docs.microsoft.com/en-us/azure/azure-resource-manager/)
+- [Template Functions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-template-functions)
