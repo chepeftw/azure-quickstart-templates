@@ -4,7 +4,7 @@
   "parameters": {
     "vmssName": {
       "type": "string",
-      "defaultValue": "new-vmss-snips",
+      "defaultValue": "vmss-snips",
       "metadata": {
         "description": "Name of the Virtual Machine Scale Set (VMSS)."
       },
@@ -13,7 +13,7 @@
     },
     "keyVaultName": {
       "type": "string",
-      "defaultValue": "new-keyvault-snips-01",
+      "defaultValue": "keyvault-snips-01",
       "metadata": {
         "description": "Name of the Vault."
       }
@@ -39,7 +39,7 @@
     },
     "dnsNameForPublicIP": {
       "type": "string",
-      "defaultValue": "new-vmss-snips-dns",
+      "defaultValue": "vmss-snips-dns",
       "metadata": {
         "description": "Unique DNS Name for the Public IP used to access the load balancer."
       }
@@ -61,7 +61,7 @@
     },
     "vaultSecretMagicNumberValue": {
       "type": "string",
-      "defaultValue": "4",
+      "defaultValue": "8",
       "metadata": {
         "description": "This is not for the final solution, but only for debugging and benchmarking purposes. As the names implies ... it is the magic number!"
       }
@@ -77,7 +77,6 @@
       "defaultValue": "password",
       "allowedValues": [
         "password",
-        "sshPublicKey"
       ],
       "metadata": {
         "description": "Type of authentication to use on the Virtual Machine."
@@ -87,6 +86,17 @@
       "type": "securestring",
       "metadata": {
         "description": "Password or ssh key for the Virtual Machine."
+      }
+    },
+    "vhdVersion": {
+      "type": "string",
+      "defaultValue": "SnipsMegazordVHD20190208_1524.vhd",
+      "allowedValues": [
+        "SnipsMegazordVHD20190208_1524.vhd",
+        "SnipsMegazordVHD20190206.vhd"
+      ],
+      "metadata": {
+        "description": "The version of the VHD in use."
       }
     }
   },
@@ -112,7 +122,7 @@
     "subnetPrefix": "10.0.0.0/24",
     "instanceCount": "2",
     "publicIPAddressName": "[concat(parameters('vmssName'), '-publicIp')]",
-    "osDiskVhdUri": "https://storagesnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190206.vhd",
+    "osDiskVhdUri": "[concat('https://storagesnips.blob.core.windows.net/mydisks/', parameters('vhdVersion'))]",
     "imageName": "[concat(parameters('vmssName'), '-image')]",
     "linuxConfiguration": {
       "disablePasswordAuthentication": true,
