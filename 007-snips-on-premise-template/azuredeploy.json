@@ -77,6 +77,7 @@
       "defaultValue": "password",
       "allowedValues": [
         "password",
+        "sshPublicKey"
       ],
       "metadata": {
         "description": "Type of authentication to use on the Virtual Machine."
@@ -90,11 +91,9 @@
     },
     "vhdVersion": {
       "type": "string",
-      "defaultValue": "SnipsMegazordVHD20190212_1314.vhd",
+      "defaultValue": "SnipsMegazordVHD20190212_1432.vhd",
       "allowedValues": [
-        "SnipsMegazordVHD20190212_1314.vhd",
-        "SnipsMegazordVHD20190208_1524.vhd",
-        "SnipsMegazordVHD20190206.vhd"
+        "SnipsMegazordVHD20190212_1432.vhd"
       ],
       "metadata": {
         "description": "The version of the VHD in use."
@@ -379,7 +378,8 @@
           "osProfile": {
             "computerNamePrefix": "[parameters('vmssName')]",
             "adminUsername": "[parameters('adminUsername')]",
-            "adminPassword": "[parameters('adminPasswordOrKey')]"
+            "adminPassword": "[parameters('adminPasswordOrKey')]",
+            "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
           },
           "networkProfile": {
             "networkInterfaceConfigurations": [
