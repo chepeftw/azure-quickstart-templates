@@ -96,7 +96,7 @@
         "SnipsMegazordVHD20190212_1432.vhd"
       ],
       "metadata": {
-        "description": "The version of the VHD in use."
+        "description": "This is not for the final solution, but only for debugging and benchmarking purposes. The version of the VHD in use."
       }
     }
   },
