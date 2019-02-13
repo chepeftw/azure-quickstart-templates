@@ -76,7 +76,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "Virtual Machine Scale Set base instances",
                         "toolTip": "The number of base instances of the Virtual Machine Scale Set",
-                        "defaultValue": "linux-vm",
+                        "defaultValue": "2",
                         "constraints": {
                             "required": true,
                             "regex": "^([0-1]?[0-9]|20)$",
