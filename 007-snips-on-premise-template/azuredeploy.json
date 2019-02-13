@@ -91,8 +91,9 @@
     },
     "vhdVersion": {
       "type": "string",
-      "defaultValue": "SnipsMegazordVHD20190212_1432.vhd",
+      "defaultValue": "SnipsMegazordVHD20190213_1018.vhd",
       "allowedValues": [
+        "SnipsMegazordVHD20190213_1018.vhd",
         "SnipsMegazordVHD20190212_1432.vhd"
       ],
       "metadata": {
@@ -122,7 +123,7 @@
     "subnetPrefix": "10.0.0.0/24",
     "instanceCount": "2",
     "publicIPAddressName": "[concat(parameters('vmssName'), '-publicIp')]",
-    "osDiskVhdUri": "[concat('https://storagesnips.blob.core.windows.net/mydisks/', parameters('vhdVersion'))]",
+    "osDiskVhdUri": "[concat('https://storagesnips.blob.core.windows.net/mydisks/', parameters('vhdVersion'), '?st=2019-02-11T10%3A27%3A32Z&se=2019-06-19T10%3A27%3A25Z&sp=rl&sv=2018-03-28&sr=c&sig=Fp7PPekkO0AYYDrsVK7xEYLw5vC7JsS0Rn20YF/HKtw%3D')]",
     "imageName": "[concat(parameters('vmssName'), '-image')]",
     "linuxConfiguration": {
       "disablePasswordAuthentication": true,
