@@ -143,6 +143,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
         "environment": "testing",
+        "parent": "[parameters('vmssName')]",
         "displayName": "Snips Storage Account"
       },
       "sku": {
@@ -158,6 +159,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
         "environment": "testing",
+        "parent": "[parameters('vmssName')]",
         "displayName": "Linux Base Image"
       },
       "properties": {
@@ -179,6 +181,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
         "environment": "testing",
+        "parent": "[parameters('vmssName')]",
         "displayName": "Snips Network Security Group"
       },
       "properties": {
@@ -219,6 +222,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
         "environment": "testing",
+        "parent": "[parameters('vmssName')]",
         "displayName": "Snips Virtual Network"
       },
       "dependsOn": [
@@ -251,6 +255,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
         "environment": "testing",
+        "parent": "[parameters('vmssName')]",
         "displayName": "Snips Public IP Address"
       },
       "sku": {
@@ -273,6 +278,7 @@
       ],
       "tags": {
         "environment": "testing",
+        "parent": "[parameters('vmssName')]",
         "displayName": "Snips VMSS Load Balancer"
       },
       "sku": {
@@ -350,6 +356,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
         "environment": "testing",
+        "parent": "[parameters('vmssName')]",
         "displayName": "Snips Virtual Machine Scale Set"
       },
       "dependsOn": [
@@ -437,6 +444,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
         "environment": "testing",
+        "parent": "[parameters('vmssName')]",
         "displayName": "Snips VMSS Autoscale Settings"
       },
       "dependsOn": [
@@ -505,6 +513,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
         "environment": "testing",
+        "parent": "[parameters('vmssName')]",
         "displayName": "Snips Vault"
       },
       "dependsOn": [
@@ -538,7 +547,8 @@
       "type": "Microsoft.KeyVault/vaults/secrets",
       "name": "[concat(parameters('keyVaultName'), '/', variables('vaultSecretTokenName'))]",
       "tags": {
-        "environment": "testing"
+        "environment": "testing",
+        "parent": "[parameters('vmssName')]"
       },
       "properties": {
         "value": "[parameters('vaultSecretTokenValue')]"
@@ -552,7 +562,8 @@
       "type": "Microsoft.KeyVault/vaults/secrets",
       "name": "[concat(parameters('keyVaultName'), '/', variables('vaultSecretMagicNumberName'))]",
       "tags": {
-        "environment": "testing"
+        "environment": "testing",
+        "parent": "[parameters('vmssName')]"
       },
       "properties": {
         "value": "[parameters('vaultSecretMagicNumberValue')]"
