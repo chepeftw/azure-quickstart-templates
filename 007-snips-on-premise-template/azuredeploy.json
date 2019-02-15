@@ -102,7 +102,7 @@
     }
   },
   "variables": {
-    "diagStorageAccountName": "[concat(parameters('vmssName'), '-diagstrg')]",
+    "diagStorageAccountName": "[concat('strg', uniquestring(resourceGroup().id))]",
     "vaultSecretTokenName": "AppToken",
     "vaultSecretMagicNumberName": "AppMagicNumber",
     "subnetName": "subnet-1",
