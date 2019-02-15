@@ -101,7 +101,7 @@
     }
   },
   "variables": {
-    "diagStorageAccountName": "[concat('strg', uniquestring(resourceGroup().id))]",
+    "diagStorageAccountName": "[concat(parameters('vmssName'), '-diagstrg')]",
     "vaultSecretTokenName": "AppToken",
     "vaultSecretMagicNumberName": "AppMagicNumber",
     "subnetName": "subnet-1",
@@ -137,6 +137,19 @@
     }
   },
   "resources": [
+    {
+      "apiVersion": "2018-02-01",
+      "name": "pid-e7cc2a30-ca39-5c52-a955-6c88b8b72597",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": []
+        }
+      }
+    },
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('diagStorageAccountName')]",
@@ -379,7 +392,10 @@
         "virtualMachineProfile": {
           "storageProfile": {
             "imageReference": {
-              "id": "[resourceId('Microsoft.Compute/images', variables('imageName'))]"
+              "publisher": "snips",
+              "offer": "on-server-vm",
+              "sku": "single-byol-vm",
+              "version": "latest"
             }
           },
           "osProfile": {
