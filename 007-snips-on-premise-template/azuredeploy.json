@@ -91,8 +91,9 @@
     },
     "vhdVersion": {
       "type": "string",
-      "defaultValue": "SnipsMegazordVHD20190214_1435.vhd",
+      "defaultValue": "SnipsMegazordVHD20190215_1458.vhd",
       "allowedValues": [
+        "SnipsMegazordVHD20190215_1458.vhd",
         "SnipsMegazordVHD20190214_1435.vhd"
       ],
       "metadata": {
