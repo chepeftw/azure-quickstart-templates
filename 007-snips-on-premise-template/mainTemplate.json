@@ -88,17 +88,6 @@
       "metadata": {
         "description": "Password or ssh key for the Virtual Machine."
       }
-    },
-    "vhdVersion": {
-      "type": "string",
-      "defaultValue": "SnipsMegazordVHD20190215_1527.vhd",
-      "allowedValues": [
-        "SnipsMegazordVHD20190215_1527.vhd",
-        "SnipsMegazordVHD20190214_1435.vhd"
-      ],
-      "metadata": {
-        "description": "DEPRECATED. This is not for the final solution, but only for debugging and benchmarking purposes. The version of the VHD in use."
-      }
     }
   },
   "variables": {
@@ -123,8 +112,6 @@
     "subnetPrefix": "10.0.0.0/24",
     "instanceCount": "2",
     "publicIPAddressName": "[concat(parameters('vmssName'), '-publicIp')]",
-    "osDiskVhdUri": "[concat('https://storageglobalsnips.blob.core.windows.net/mydisks/', parameters('vhdVersion'))]",
-    "imageName": "[concat(parameters('vmssName'), '-image')]",
     "linuxConfiguration": {
       "disablePasswordAuthentication": true,
       "ssh": {

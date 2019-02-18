@@ -17,6 +17,18 @@
                 }
             },
             {
+                "name": "vaultName",
+                "type": "Microsoft.Common.TextBox",
+                "label": "Key Vault name",
+                "toolTip": "The name of the Key Vault, where the token is stored.",
+                "defaultValue": "vmss-snips",
+                "constraints": {
+                    "required": true,
+                    "regex": "^[a-z0-9A-Z-]{3,79}$",
+                    "validationMessage": "The Key Vault Name must be unique and between 3 and 24 characters long and contain letters, numbers and hyphens only."
+                }
+            },
+            {
                 "name": "snipsToken",
                 "type": "Microsoft.Common.TextBox",
                 "label": "Snips Token",
@@ -108,7 +120,7 @@
         "outputs": {
 
             "vmssName": "[basics('vmssName')]",
-            "keyVaultName": "[concat('keyvault-', basics('vmssName'))]",
+            "keyVaultName": "[basics('vaultName')]",
 
             "vmSize": "[steps('VirtualMachineConfig').vmSize]",
             "dnsNameForPublicIP": "[concat('dns-', basics('vmssName'))]",
@@ -119,9 +131,7 @@
 
             "adminUsername": "[basics('adminUsername')]",
             "authenticationType": "[basics('SSHCredentials').authenticationType]",
-            "adminPasswordOrKey": "[coalesce(basics('SSHCredentials').password, basics('SSHCredentials').sshPublicKey)]",
-
-            "vhdVersion": "SnipsMegazordVHD20190212_1432.vhd"
+            "adminPasswordOrKey": "[coalesce(basics('SSHCredentials').password, basics('SSHCredentials').sshPublicKey)]"
         }
     }
 }
