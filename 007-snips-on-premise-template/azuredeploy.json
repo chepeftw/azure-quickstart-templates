@@ -97,7 +97,7 @@
         "SnipsMegazordVHD20190214_1435.vhd"
       ],
       "metadata": {
-        "description": "This is not for the final solution, but only for debugging and benchmarking purposes. The version of the VHD in use."
+        "description": "DEPRECATED. This is not for the final solution, but only for debugging and benchmarking purposes. The version of the VHD in use."
       }
     }
   },
@@ -166,28 +166,6 @@
       "kind": "Storage",
       "properties": {},
       "apiVersion": "2018-02-01"
-    },
-    {
-      "type": "Microsoft.Compute/images",
-      "name": "[variables('imageName')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "environment": "testing",
-        "parent": "[parameters('vmssName')]",
-        "displayName": "Linux Base Image"
-      },
-      "properties": {
-        "storageProfile": {
-          "osDisk": {
-            "osType": "Linux",
-            "osState": "Generalized",
-            "blobUri": "[variables('osDiskVhdUri')]",
-            "caching": "ReadWrite",
-            "storageAccountType": "Standard_LRS"
-          }
-        }
-      },
-      "apiVersion": "2018-04-01"
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
@@ -380,7 +358,6 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Compute/images/', variables('imageName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
       ],
       "sku": {
