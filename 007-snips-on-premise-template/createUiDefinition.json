@@ -24,8 +24,7 @@
                 "defaultValue": "your-snips-token-from-the-snips-console",
                 "constraints": {
                     "required": true,
-                    "regex": "^[a-z0-9A-Z-]{3,79}$",
-                    "validationMessage": "The Snips Token must be between 3 and 79 characters long and contain letters, numbers and hyphens only."
+                    "validationMessage": "The Snips Token is required, you can get it from the Snips Console website after creating your assistant."
                 }
             },
             {
@@ -113,7 +112,7 @@
 
             "vmSize": "[steps('VirtualMachineConfig').vmSize]",
             "dnsNameForPublicIP": "[concat('dns-', basics('vmssName'))]",
-            "capacity": "[steps('VirtualMachineConfig').vmssCount]",
+            "capacity": "[int(steps('VirtualMachineConfig').vmssCount)]",
 
             "vaultSecretTokenValue": "[basics('snipsToken')]",
             "vaultSecretMagicNumberValue": "8",

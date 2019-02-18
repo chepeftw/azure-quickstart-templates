@@ -368,6 +368,11 @@
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "name": "[parameters('vmssName')]",
       "location": "[resourceGroup().location]",
+      "plan": {
+        "name": "single-byol-vm",
+        "product": "on-server-vm",
+        "publisher": "snips"
+      },
       "tags": {
         "environment": "testing",
         "parent": "[parameters('vmssName')]",
