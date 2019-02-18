@@ -508,7 +508,7 @@
     },
     {
       "type": "Microsoft.KeyVault/vaults",
-      "name": "[parameters('keyVaultName')]",
+      "name": "[substring(parameters('keyVaultName'), 0, 24)]",
       "location": "[resourceGroup().location]",
       "tags": {
         "environment": "testing",

@@ -69,3 +69,4 @@ To properly add you token after the deployment, keep in mind that you first have
 - [Application Offer](https://docs.microsoft.com/en-gb/azure/marketplace/cloud-partner-portal/azure-applications/cpp-azure-app-offer)
 - [Template Tutorials](https://docs.microsoft.com/en-us/azure/azure-resource-manager/)
 - [Template Functions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-template-functions)
+- [Template errors](https://kvaes.wordpress.com/2016/05/02/azure-resource-manager-marketplace-image-requires-plan-information-in-the-request/)
