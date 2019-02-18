@@ -64,6 +64,13 @@ This token can be generated from the [Snips Console](https://console.snips.ai/).
 Then you can enter the token when creating the deployment in Azure or later through the Azure Vault.
 To properly add you token after the deployment, keep in mind that you first have to give your user access to the vault itself.
 
+## Test the UiDefinition.json
+
+You need a script that can be found on Github.
+
+- [Azure Quickstart Templates](https://github.com/Azure/azure-quickstart-templates)
+- [Test Azure portal interface for your managed application](https://docs.microsoft.com/en-gb/azure/managed-applications/test-createuidefinition)
+
 ## Useful References
 
 - [Application Offer](https://docs.microsoft.com/en-gb/azure/marketplace/cloud-partner-portal/azure-applications/cpp-azure-app-offer)
