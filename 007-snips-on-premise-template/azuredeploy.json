@@ -15,7 +15,7 @@
       "type": "string",
       "defaultValue": "keyvault-snips-01",
       "metadata": {
-        "description": "Name of the Vault."
+        "description": "Name of the Vault which MUST be between 3 and 24 characters."
       }
     },
     "vmSize": {
@@ -508,7 +508,7 @@
     },
     {
       "type": "Microsoft.KeyVault/vaults",
-      "name": "[substring(parameters('keyVaultName'), 0, 24)]",
+      "name": "[parameters('keyVaultName')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "environment": "testing",
