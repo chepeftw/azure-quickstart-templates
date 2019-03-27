@@ -93,7 +93,7 @@
   "variables": {
     "diagStorageAccountName": "[concat('strg', uniquestring(resourceGroup().id))]",
     "vaultSecretTokenName": "AppToken",
-    "vaultSecretMagicNumberName": "AppMagicNumber",
+    "vaultSecretMagicNumberName": "AppInstancesNumber",
     "subnetName": "subnet-1",
     "virtualNetworkName": "[concat(parameters('vmssName'), '-vnet')]",
     "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),  variables('subnetName'))]",
