@@ -406,10 +406,7 @@
         "virtualMachineProfile": {
           "storageProfile": {
             "imageReference": {
-              "publisher": "snips",
-              "offer": "on-server-vm",
-              "sku": "single-byol-vm",
-              "version": "latest"
+              "id": "[resourceId('Microsoft.Compute/images', variables('imageName'))]"
             }
           },
           "osProfile": {
