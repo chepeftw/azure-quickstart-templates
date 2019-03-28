@@ -123,7 +123,7 @@
         ]
       }
     },
-    "osDiskVhdUri": "https://storageglobalsnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190327_1514.vhd",
+    "osDiskVhdUri": "https://storageglobalsnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190328_0843.vhd",
     "imageName": "[concat(parameters('vmssName'), '-image')]"
   },
   "resources": [
