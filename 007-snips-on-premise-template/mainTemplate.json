@@ -2,6 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "imageUrl": {
+      "type": "string",
+      "defaultValue": "https://storageglobalsnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190401_1723.vhd",
+      "metadata": {
+        "description": "Url of the VHD."
+      }
+    },
     "vmssName": {
       "type": "string",
       "defaultValue": "vmss-snips",
@@ -123,7 +130,7 @@
         ]
       }
     },
-    "osDiskVhdUri": "https://storageglobalsnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190328_1411.vhd",
+    "osDiskVhdUri": "[parameters('imageUrl')]",
     "imageName": "[concat(parameters('vmssName'), '-image')]"
   },
   "resources": [
