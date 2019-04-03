@@ -2,13 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "imageUrl": {
-      "type": "string",
-      "defaultValue": "https://storageglobalsnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190401_1723.vhd",
-      "metadata": {
-        "description": "Url of the VHD."
-      }
-    },
     "vmssName": {
       "type": "string",
       "defaultValue": "vmss-snips",
@@ -98,6 +91,10 @@
     }
   },
   "variables": {
+    "publisherName": "snips",
+    "offerName": "on-server-vm",
+    "skuName": "single-byol-vm",
+    "versionName": "1.0.4",
     "diagStorageAccountName": "[concat('strg', uniquestring(resourceGroup().id))]",
     "vaultSecretTokenName": "AppToken",
     "vaultSecretMagicNumberName": "AppInstancesNumber",
@@ -129,9 +126,7 @@
           }
         ]
       }
-    },
-    "osDiskVhdUri": "[parameters('imageUrl')]",
-    "imageName": "[concat(parameters('vmssName'), '-image')]"
+    }
   },
   "resources": [
     {
@@ -149,28 +144,6 @@
       "kind": "Storage",
       "properties": {},
       "apiVersion": "2018-02-01"
-    },
-    {
-      "type": "Microsoft.Compute/images",
-      "name": "[variables('imageName')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "environment": "testing",
-        "parent": "[parameters('vmssName')]",
-        "displayName": "Linux Base Image"
-      },
-      "properties": {
-        "storageProfile": {
-          "osDisk": {
-            "osType": "Linux",
-            "osState": "Generalized",
-            "blobUri": "[variables('osDiskVhdUri')]",
-            "caching": "ReadWrite",
-            "storageAccountType": "Standard_LRS"
-          }
-        }
-      },
-      "apiVersion": "2018-04-01"
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
@@ -383,6 +356,11 @@
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "name": "[parameters('vmssName')]",
       "location": "[resourceGroup().location]",
+      "plan": {
+        "name": "[variables('skuName')]",
+        "product": "[variables('offerName')]",
+        "publisher": "[variables('publisherName')]"
+      },
       "tags": {
         "environment": "testing",
         "parent": "[parameters('vmssName')]",
@@ -390,7 +368,6 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Compute/images/', variables('imageName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
       ],
       "sku": {
@@ -408,7 +385,10 @@
         "virtualMachineProfile": {
           "storageProfile": {
             "imageReference": {
-              "id": "[resourceId('Microsoft.Compute/images', variables('imageName'))]"
+              "publisher": "[variables('publisherName')]",
+              "offer": "[variables('offerName')]",
+              "sku": "[variables('skuName')]",
+              "version": "[variables('versionName')]"
             }
           },
           "osProfile": {

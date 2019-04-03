@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmssName": {
+            "value": "GEN-VMSS-NAME"
+        },
+        "keyVaultName": {
+            "value": "GEN-UNIQUE"
+        },
+        "subnetName": {
+            "value": "GEN-VNET-SUBNET1-NAME"
+        },
+        "dnsNameForPublicIP": {
+            "value": "GEN-UNIQUE"
+        },
+        "adminUsername": {
+            "value": "GEN-UNIQUE"
+        },
+        "adminPasswordOrKey": {
+            "value": "GEN-PASSWORD"
+        }
+    }
+}

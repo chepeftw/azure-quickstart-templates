@@ -1,0 +1,11 @@
+{
+  "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+  "type": "QuickStart",
+  "itemDisplayName": "Create a Virtual Machine Scale Set to support the Snips On-Premise solution.",
+  "description": "This template creates an Storage Account, Network Security Group, Virtual Network, Public IP Address, Load Balancer and a Virtual Machine Scale Set running the Snips On-Premise solution.",
+  "summary": "Creates the required infrastructure to run Azure On Premise solution.",
+  "githubUsername": "snipsco",
+  "dateUpdated": "2019-02-14"
+}
+
+
