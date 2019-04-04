@@ -94,7 +94,7 @@
     "publisherName": "snips",
     "offerName": "on-server-vm",
     "skuName": "single-byol-vm",
-    "versionName": "1.0.4",
+    "versionName": "1.0.5",
     "diagStorageAccountName": "[concat('strg', uniquestring(resourceGroup().id))]",
     "vaultSecretTokenName": "AppToken",
     "vaultSecretMagicNumberName": "AppInstancesNumber",
