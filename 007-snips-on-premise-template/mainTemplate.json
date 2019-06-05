@@ -27,21 +27,23 @@
     },
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_DS1_v2",
+      "defaultValue": "Standard_DS11-1_v2",
       "metadata": {
         "description": "Size of the virtual machines inside the VMSS."
       },
       "allowedValues": [
+        "Standard_DS11-1_v2",
+        "Standard_DS11_v2",
+        "Standard_DS12_v2",
+        "Standard_DS13_v2",
         "Standard_DS1_v2",
         "Standard_DS2_v2",
         "Standard_DS3_v2",
         "Standard_DS4_v2",
-        "Standard_DS5_v2",
         "Standard_D2s_v3",
         "Standard_D4s_v3",
         "Standard_D8s_v3",
-        "Standard_D16s_v3",
-        "Standard_D32s_v3"
+        "Standard_D16s_v3"
       ]
     },
     "dnsNameForPublicIP": {
@@ -56,7 +58,7 @@
       "metadata": {
         "description": "Number of VM instances (20 or less)."
       },
-      "defaultValue": 2,
+      "defaultValue": 1,
       "maxValue": 20
     },
     "vaultSecretTokenValue": {
@@ -66,7 +68,7 @@
         "description": "The token provided by Snips through the Snips console."
       }
     },
-    "vaultSecretMagicNumberValue": {
+    "vaultSecretInstancesNumberValue": {
       "type": "string",
       "defaultValue": "8",
       "metadata": {
@@ -98,9 +100,13 @@
     }
   },
   "variables": {
+    "publisherName": "snips",
+    "offerName": "on-server-vm",
+    "skuName": "single-byol-vm",
+    "versionName": "latest",
     "diagStorageAccountName": "[concat('strg', uniquestring(resourceGroup().id))]",
     "vaultSecretTokenName": "AppToken",
-    "vaultSecretMagicNumberName": "AppInstancesNumber",
+    "vaultSecretInstancesNumberName": "AppInstancesNumber",
     "subnetName": "subnet-1",
     "virtualNetworkName": "[concat(parameters('vmssName'), '-vnet')]",
     "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),  variables('subnetName'))]",
@@ -129,9 +135,7 @@
           }
         ]
       }
-    },
-    "osDiskVhdUri": "[parameters('imageUrl')]",
-    "imageName": "[concat(parameters('vmssName'), '-image')]"
+    }
   },
   "resources": [
     {
@@ -170,7 +174,7 @@
           }
         }
       },
-      "apiVersion": "2018-04-01"
+      "apiVersion": "2018-06-01"
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
@@ -595,13 +599,28 @@
     },
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
-      "name": "[concat(parameters('keyVaultName'), '/', variables('vaultSecretMagicNumberName'))]",
+      "name": "[concat(parameters('keyVaultName'), '/', variables('vaultSecretInstancesNumberName'))]",
       "tags": {
         "environment": "testing",
         "parent": "[parameters('vmssName')]"
       },
       "properties": {
-        "value": "[parameters('vaultSecretMagicNumberValue')]"
+        "value": "[parameters('vaultSecretInstancesNumberValue')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+      ],
+      "apiVersion": "2015-06-01"
+    } ,
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(parameters('keyVaultName'), '/', variables('vaultSecretStorageKeyName'))]",
+      "tags": {
+        "environment": "testing",
+        "parent": "[parameters('vmssName')]"
+      },
+      "properties": {
+        "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
       },
       "dependsOn": [
         "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
