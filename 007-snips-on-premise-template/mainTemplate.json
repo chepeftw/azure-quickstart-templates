@@ -613,21 +613,6 @@
         "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
       ],
       "apiVersion": "2015-06-01"
-    } ,
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "name": "[concat(parameters('keyVaultName'), '/', variables('vaultSecretStorageKeyName'))]",
-      "tags": {
-        "environment": "testing",
-        "parent": "[parameters('vmssName')]"
-      },
-      "properties": {
-        "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('diagStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
-      ],
-      "apiVersion": "2015-06-01"
     }
   ],
   "outputs": {}
