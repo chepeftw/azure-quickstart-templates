@@ -125,6 +125,7 @@
     "subnetPrefix": "10.0.0.0/24",
     "instanceCount": "2",
     "publicIPAddressName": "[concat(parameters('vmssName'), '-publicIp')]",
+    "imageName": "[concat(parameters('vmssName'), '-image')]",
     "linuxConfiguration": {
       "disablePasswordAuthentication": true,
       "ssh": {
