@@ -104,6 +104,7 @@
     "offerName": "on-server-vm",
     "skuName": "single-byol-vm",
     "versionName": "latest",
+    "osDiskVhdUri": "[parameters('imageUrl')]",
     "diagStorageAccountName": "[concat('strg', uniquestring(resourceGroup().id))]",
     "vaultSecretTokenName": "AppToken",
     "vaultSecretInstancesNumberName": "AppInstancesNumber",
