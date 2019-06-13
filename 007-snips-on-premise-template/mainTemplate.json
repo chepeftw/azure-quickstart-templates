@@ -4,7 +4,7 @@
   "parameters": {
     "imageUrl": {
       "type": "string",
-      "defaultValue": "https://storageglobalsnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190401_1723.vhd",
+      "defaultValue": "https://storageglobalsnips.blob.core.windows.net/mydisks/SnipsMegazordVHD20190603_1005.vhd",
       "metadata": {
         "description": "Url of the VHD."
       }
