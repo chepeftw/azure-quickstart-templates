@@ -207,7 +207,7 @@
                 }
             },
             "apiVersion": "2018-06-01",
-            "condition": "[equals(parameters('production'), false)]"
+            "condition": "[equals(parameters('production'), bool('false'))]"
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
@@ -421,9 +421,9 @@
             "name": "[parameters('vmssName')]",
             "location": "[resourceGroup().location]",
             "plan": {
-                "publisher": "[if(equals(parameters('production'), true), variables('cloudpartner').publisherName, json('null'))]",
-                "product": "[if(equals(parameters('production'), true), variables('cloudpartner').offerName, json('null'))]",
-                "name": "[if(equals(parameters('production'), true), variables('cloudpartner').skuName, json('null'))]"
+                "publisher": "[if(equals(parameters('production'), bool('true')), variables('cloudpartner').publisherName, json('null'))]",
+                "product": "[if(equals(parameters('production'), bool('true')), variables('cloudpartner').offerName, json('null'))]",
+                "name": "[if(equals(parameters('production'), bool('true')), variables('cloudpartner').skuName, json('null'))]"
             },
             "tags": {
                 "environment": "testing",
@@ -450,11 +450,11 @@
                 "virtualMachineProfile": {
                     "storageProfile": {
                         "imageReference": {
-                            "id": "[if(equals(parameters('production'), false), resourceId('Microsoft.Compute/images', variables('imageName')), json('null'))]",
-                            "publisher": "[if(equals(parameters('production'), true), variables('cloudpartner').publisherName, json('null'))]",
-                            "offer": "[if(equals(parameters('production'), true), variables('cloudpartner').offerName, json('null'))]",
-                            "name": "[if(equals(parameters('production'), true), variables('cloudpartner').skuName, json('null'))]",
-                            "version": "[if(equals(parameters('production'), true), variables('cloudpartner').versionName, json('null'))]"
+                            "id": "[if(equals(parameters('production'), bool('false')), resourceId('Microsoft.Compute/images', variables('imageName')), json('null'))]",
+                            "publisher": "[if(equals(parameters('production'), bool('true')), variables('cloudpartner').publisherName, json('null'))]",
+                            "offer": "[if(equals(parameters('production'), bool('true')), variables('cloudpartner').offerName, json('null'))]",
+                            "name": "[if(equals(parameters('production'), bool('true')), variables('cloudpartner').skuName, json('null'))]",
+                            "version": "[if(equals(parameters('production'), bool('true')), variables('cloudpartner').versionName, json('null'))]"
                         }
                     },
                     "osProfile": {
