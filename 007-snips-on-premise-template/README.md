@@ -7,6 +7,12 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
+## Dev JSON
+
+<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fchepeftw%2Fazure-quickstart-templates%2Fmaster%2F007-snips-on-premise-template%2FmainTemplate.dev.json" target="_blank">
+    <img src="http://armviz.io/visualizebutton.png"/>
+</a>
+
 ## Prerequisites
 
 - Snips Token, you can get it from https://console.snips.ai/. This will be asked as the input for this deployment. You can add it later but it is better if you have it before hand.
@@ -63,6 +69,20 @@ To allow the instances to pull the proper Snips assistant, it relies on a token.
 This token can be generated from the [Snips Console](https://console.snips.ai/).
 Then you can enter the token when creating the deployment in Azure or later through the Azure Vault.
 To properly add you token after the deployment, keep in mind that you first have to give your user access to the vault itself.
+
+## Test the mainTemplae.json
+
+To validate or dry-run:
+
+```bash
+az group deployment validate --resource-group templateDeployments --template-file mainTemplate.json  --parameters @azuredeploy.parameters.json
+```
+
+To run:
+
+```bash
+az group deployment create --name TestDeployment201906171131 --resource-group templateDeployments --template-file mainTemplate.json  --parameters @azuredeploy.parameters.json
+```
 
 ## Test the UiDefinition.json
 
