@@ -214,13 +214,13 @@
       "offer": "[variables('cloudpartner').offerName]"
     }, 
     "vault": {
-      "proxyProtocolName": "NetworkProxy_Protocol", 
+      "proxyProtocolName": "NetworkProxy-Protocol", 
       "instancesNumberName": "AppInstancesNumber", 
-      "proxyPasswordName": "NetworkProxy_Password", 
+      "proxyPasswordName": "NetworkProxy-Password", 
       "tokenName": "AppToken", 
-      "proxyPortName": "NetworkProxy_Port", 
-      "proxyHostName": "NetworkProxy_Host", 
-      "proxyUserName": "NetworkProxy_User"
+      "proxyPortName": "NetworkProxy-Port", 
+      "proxyHostName": "NetworkProxy-Host", 
+      "proxyUserName": "NetworkProxy-User"
     }, 
     "virtualNetworkName": "[concat(parameters('vmssName'), '-vnet')]", 
     "loadbalancer": {
