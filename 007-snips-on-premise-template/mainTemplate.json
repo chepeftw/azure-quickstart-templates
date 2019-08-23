@@ -191,6 +191,7 @@
     }, 
     "diagStorageAccountName": "[concat('strg', uniquestring(resourceGroup().id))]", 
     "network": {
+      "securityGroupName": "[concat('nsg-', parameters('vmssName'))]", 
       "addressPrefix": "10.0.0.0/16", 
       "publicIPAddressName": "[concat(parameters('vmssName'), '-publicIp')]", 
       "nicName": "[concat(parameters('vmssName'), 'nic')]", 
@@ -296,7 +297,7 @@
       "location": "[parameters('location')]"
     }, 
     {
-      "name": "[concat('nsg-', parameters('vmssName'))]", 
+      "name": "[variables('network').securityGroupName]", 
       "tags": {
         "environment": "testing", 
         "displayName": "Snips Network Security Group", 
@@ -357,7 +358,7 @@
         "parent": "[parameters('vmssName')]"
       }, 
       "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', 'nsg-', parameters('vmssName'))]"
+        "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('network').securityGroupName)]"
       ], 
       "type": "Microsoft.Network/virtualNetworks", 
       "properties": {
@@ -366,7 +367,7 @@
             "properties": {
               "addressPrefix": "[variables('network').subnetPrefix]", 
               "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', parameters('vmssName') ))]"
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('network').securityGroupName)]"
               }
             }, 
             "name": "[variables('network').subnetName]", 
@@ -396,7 +397,7 @@
       "properties": {
         "publicIPAllocationMethod": "Static", 
         "dnsSettings": {
-          "domainNameLabel": "[parameters('vmssName')]"
+          "domainNameLabel": "[concat(parameters('vmssName'), '-', uniquestring(resourceGroup().id))]"
         }
       }, 
       "apiVersion": "2018-04-01", 
@@ -415,7 +416,7 @@
       "apiVersion": "2018-08-01", 
       "location": "[parameters('location')]", 
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('network').publicIPAddressName)]"
+        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('network').publicIPAddressName)]"
       ], 
       "type": "Microsoft.Network/loadBalancers", 
       "properties": {
@@ -439,7 +440,7 @@
               "protocol": "Tcp", 
               "backendPort": 80, 
               "probe": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '/probes/', variables('probeName'))]"
+                "id": "[resourceId('Microsoft.Network/loadBalancers', variables('lbName'), '/probes/', variables('probeName'))]"
               }, 
               "enableFloatingIP": false, 
               "backendAddressPool": {
@@ -458,7 +459,7 @@
               "protocol": "Tcp", 
               "backendPort": 443, 
               "probe": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '/probes/', variables('probeName'))]"
+                "id": "[resourceId('Microsoft.Network/loadBalancers', variables('lbName'), '/probes/', variables('probeName'))]"
               }, 
               "enableFloatingIP": false, 
               "backendAddressPool": {
@@ -517,9 +518,9 @@
       "apiVersion": "2018-06-01", 
       "plan": "[if(equals(parameters('production'), bool('true')), variables('virtualMachinePlan'), json('null'))]", 
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]", 
-        "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]", 
-        "[if(equals(parameters('production'), bool('false')), concat('Microsoft.Compute/images/', variables('imageName')), concat('Microsoft.Network/loadBalancers/', variables('lbName')))]"
+        "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]", 
+        "[resourceId('Microsoft.Network/loadBalancers/', variables('lbName'))]", 
+        "[if(equals(parameters('production'), bool('false')), resourceId('Microsoft.Compute/images/', variables('imageName')), resourceId('Microsoft.Network/loadBalancers/', variables('lbName')))]"
       ], 
       "type": "Microsoft.Compute/virtualMachineScaleSets", 
       "properties": {
@@ -686,7 +687,7 @@
         "accessPolicies": [
           {
             "tenantId": "[subscription().tenantId]", 
-            "objectId": "[reference(concat(resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId]", 
+            "objectId": "[reference(resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId]", 
             "permissions": {
               "secrets": [
                 "Get", 
