@@ -10,7 +10,7 @@
     }, 
     "vaultSecretNetworkProxyPassword": {
       "defaultValue": "", 
-      "type": "string", 
+      "type": "securestring", 
       "metadata": {
         "description": "The password for authentication, if present, for the proxy used to download the Snips assistant. The proxy password depends on the proxy user for it to work."
       }
@@ -34,10 +34,16 @@
       }
     }, 
     "vaultSecretTokenValue": {
-      "defaultValue": "your-snips-token-from-the-snips-console", 
       "type": "string", 
       "metadata": {
         "description": "The token provided by Snips through the Snips console."
+      }
+    }, 
+    "vaultSecretWSAuthUser": {
+      "defaultValue": "", 
+      "type": "string", 
+      "metadata": {
+        "description": "The username for basic authentication for the WS."
       }
     }, 
     "vaultSecretNetworkProxyHost": {
@@ -53,11 +59,11 @@
         "description": "User name for the Virtual Machines."
       }
     }, 
-    "keyVaultName": {
-      "defaultValue": "keyvault-snips-01", 
-      "type": "string", 
+    "vaultSecretWSAuthPassword": {
+      "defaultValue": "", 
+      "type": "securestring", 
       "metadata": {
-        "description": "Name of the Vault which MUST be between 3 and 24 characters."
+        "description": "The password for basic authentication for the WS."
       }
     }, 
     "adminPasswordOrKey": {
@@ -72,13 +78,6 @@
       "maxValue": 20, 
       "metadata": {
         "description": "Number of VM instances (20 or less)."
-      }
-    }, 
-    "dnsNameForPublicIP": {
-      "defaultValue": "vmss-snips-dns", 
-      "type": "string", 
-      "metadata": {
-        "description": "Unique DNS Name for the Public IP used to access the load balancer."
       }
     }, 
     "vmssName": {
@@ -108,16 +107,16 @@
         "description": "Select whether the deployment should be in production or not. If its in prod, then the an image from the Marketplace will be used, otherwise it will use the imageUrl parameter."
       }
     }, 
-    "vaultSecretInstancesNumberValue": {
-      "defaultValue": "8", 
+    "location": {
+      "defaultValue": "[resourceGroup().location]", 
       "type": "string", 
       "metadata": {
-        "description": "This is not for the final solution, but only for debugging and benchmarking purposes. As the names implies ... it is the magic number!"
+        "description": "Location for all resources."
       }
     }, 
     "vaultSecretNetworkProxyPort": {
-      "defaultValue": "", 
-      "type": "string", 
+      "defaultValue": 3128, 
+      "type": "int", 
       "metadata": {
         "description": "The port for the proxy used to download the Snips assistant. The proxy port depends on the proxy host for it to work."
       }
@@ -142,6 +141,13 @@
         "Standard_D8s_v3", 
         "Standard_D16s_v3"
       ]
+    }, 
+    "vaultSecretInstancesNumberValue": {
+      "defaultValue": "8", 
+      "type": "string", 
+      "metadata": {
+        "description": "This is not for the final solution, but only for debugging and benchmarking purposes. As the names implies ... it is the magic number!"
+      }
     }
   }, 
   "outputs": {
@@ -168,8 +174,8 @@
     "cloudpartner": {
       "skuName": "single-byol-vm", 
       "publisherName": "snips", 
-      "offerName": "on-server-vm", 
-      "versionName": "latest"
+      "versionName": "latest", 
+      "offerName": "on-server-vm"
     }, 
     "lbName": "[concat(parameters('vmssName'), '-lb')]", 
     "linuxConfiguration": {
@@ -191,7 +197,7 @@
       "ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]", 
       "natPoolName": "[concat(variables('lbName'), 'natpool')]", 
       "subnetName": "subnet-1", 
-      "subnetRef": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),  'subnet-1')]", 
+      "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),  'subnet-1')]", 
       "subnetPrefix": "10.0.0.0/24"
     }, 
     "virtualMachineImageRefDev": {
@@ -214,21 +220,24 @@
       "offer": "[variables('cloudpartner').offerName]"
     }, 
     "vault": {
-      "proxyProtocolName": "NetworkProxy-Protocol", 
-      "instancesNumberName": "AppInstancesNumber", 
+      "name": "[concat('vlt-', uniquestring(resourceGroup().id))]", 
       "proxyPasswordName": "NetworkProxy-Password", 
       "tokenName": "AppToken", 
+      "wsAuthPasswordName": "WSAuth-Password", 
       "proxyPortName": "NetworkProxy-Port", 
+      "proxyProtocolName": "NetworkProxy-Protocol", 
+      "proxyUserName": "NetworkProxy-User", 
       "proxyHostName": "NetworkProxy-Host", 
-      "proxyUserName": "NetworkProxy-User"
+      "wsAuthUserName": "WSAuth-Username", 
+      "instancesNumberName": "AppInstancesNumber"
     }, 
     "virtualNetworkName": "[concat(parameters('vmssName'), '-vnet')]", 
     "loadbalancer": {
-      "feIpConfigId": "[concat(variables('lbID'),'/frontendIPConfigurations/', variables('feIpConfigName'))]", 
+      "feIpConfigId": "[resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', variables('lbName'), variables('feIpConfigName'))]", 
       "fePoolName": "[variables('fePoolName')]", 
       "feIpConfigName": "[variables('feIpConfigName')]", 
       "lbID": "[variables('lbID')]", 
-      "bePoolID": "[concat(variables('lbID'), '/backendAddressPools/', variables('bePoolName'))]", 
+      "bePoolID": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('lbName'), variables('bePoolName'))]", 
       "bePoolName": "[variables('bePoolName')]"
     }
   }, 
@@ -259,7 +268,7 @@
         "parent": "[parameters('vmssName')]"
       }, 
       "apiVersion": "2018-02-01", 
-      "location": "[resourceGroup().location]", 
+      "location": "[parameters('location')]", 
       "type": "Microsoft.Storage/storageAccounts", 
       "properties": {}
     }, 
@@ -284,7 +293,7 @@
         }
       }, 
       "apiVersion": "2018-06-01", 
-      "location": "[resourceGroup().location]"
+      "location": "[parameters('location')]"
     }, 
     {
       "name": "[concat('nsg-', parameters('vmssName'))]", 
@@ -338,7 +347,7 @@
         ]
       }, 
       "apiVersion": "2018-07-01", 
-      "location": "[resourceGroup().location]"
+      "location": "[parameters('location')]"
     }, 
     {
       "name": "[variables('virtualNetworkName')]", 
@@ -361,7 +370,7 @@
               }
             }, 
             "name": "[variables('network').subnetName]", 
-            "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName')), '/subnets/', variables('network').subnetName)]"
+            "id": "[variables('network').subnetRef]"
           }
         ], 
         "addressSpace": {
@@ -370,8 +379,8 @@
           ]
         }
       }, 
-      "apiVersion": "2015-06-15", 
-      "location": "[resourceGroup().location]"
+      "apiVersion": "2018-11-01", 
+      "location": "[parameters('location')]"
     }, 
     {
       "sku": {
@@ -387,11 +396,11 @@
       "properties": {
         "publicIPAllocationMethod": "Static", 
         "dnsSettings": {
-          "domainNameLabel": "[parameters('dnsNameForPublicIP')]"
+          "domainNameLabel": "[parameters('vmssName')]"
         }
       }, 
       "apiVersion": "2018-04-01", 
-      "location": "[resourceGroup().location]"
+      "location": "[parameters('location')]"
     }, 
     {
       "sku": {
@@ -404,7 +413,7 @@
         "parent": "[parameters('vmssName')]"
       }, 
       "apiVersion": "2018-08-01", 
-      "location": "[resourceGroup().location]", 
+      "location": "[parameters('location')]", 
       "dependsOn": [
         "[concat('Microsoft.Network/publicIPAddresses/', variables('network').publicIPAddressName)]"
       ], 
@@ -505,7 +514,7 @@
         "displayName": "Snips Virtual Machine Scale Set", 
         "parent": "[parameters('vmssName')]"
       }, 
-      "apiVersion": "2017-03-30", 
+      "apiVersion": "2018-06-01", 
       "plan": "[if(equals(parameters('production'), bool('true')), variables('virtualMachinePlan'), json('null'))]", 
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]", 
@@ -534,7 +543,7 @@
                   "type": "CustomScript", 
                   "autoUpgradeMinorVersion": true, 
                   "settings": {
-                    "commandToExecute": "[concat('echo ', parameters('keyVaultName'), ' > /var/www/vaultname.txt')]"
+                    "commandToExecute": "[concat('echo ', variables('vault').name, ' > /var/www/vaultname.txt')]"
                   }
                 }
               }
@@ -557,16 +566,16 @@
                       "name": "[variables('network').ipConfigName]", 
                       "properties": {
                         "subnet": {
-                          "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName')), '/subnets/', variables('network').subnetName)]"
+                          "id": "[variables('network').subnetRef]"
                         }, 
                         "loadBalancerInboundNatPools": [
                           {
-                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('lbName'), '/inboundNatPools/', variables('network').natPoolName)]"
+                            "id": "[resourceId('Microsoft.Network/loadBalancers/inboundNatPools', variables('lbName'), variables('network').natPoolName)]"
                           }
                         ], 
                         "loadBalancerBackendAddressPools": [
                           {
-                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('lbName'), '/backendAddressPools/', variables('loadbalancer').bePoolName)]"
+                            "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('lbName'), variables('loadbalancer').bePoolName)]"
                           }
                         ]
                       }
@@ -584,7 +593,7 @@
       "identity": {
         "type": "SystemAssigned"
       }, 
-      "location": "[resourceGroup().location]"
+      "location": "[parameters('location')]"
     }, 
     {
       "name": "[concat('autoscalesettings-',parameters('vmssName'))]", 
@@ -594,11 +603,11 @@
         "parent": "[parameters('vmssName')]"
       }, 
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
+        "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
       ], 
       "type": "Microsoft.Insights/autoscaleSettings", 
       "properties": {
-        "targetResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]", 
+        "targetResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]", 
         "enabled": true, 
         "name": "[concat('autoscalesettings-',parameters('vmssName'))]", 
         "profiles": [
@@ -614,7 +623,7 @@
                 "metricTrigger": {
                   "timeGrain": "PT1M", 
                   "timeWindow": "PT5M", 
-                  "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]", 
+                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]", 
                   "operator": "GreaterThan", 
                   "metricNamespace": "", 
                   "statistic": "Average", 
@@ -633,7 +642,7 @@
                 "metricTrigger": {
                   "timeGrain": "PT1M", 
                   "timeWindow": "PT5M", 
-                  "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/',parameters('vmssName'))]", 
+                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]", 
                   "operator": "LessThan", 
                   "metricNamespace": "", 
                   "statistic": "Average", 
@@ -653,17 +662,17 @@
         ]
       }, 
       "apiVersion": "2015-04-01", 
-      "location": "[resourceGroup().location]"
+      "location": "[parameters('location')]"
     }, 
     {
-      "name": "[parameters('keyVaultName')]", 
+      "name": "[variables('vault').name]", 
       "tags": {
         "environment": "testing", 
         "displayName": "Snips Vault", 
         "parent": "[parameters('vmssName')]"
       }, 
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
+        "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
       ], 
       "type": "Microsoft.KeyVault/vaults", 
       "properties": {
@@ -689,112 +698,142 @@
         "tenantId": "[subscription().tenantId]"
       }, 
       "apiVersion": "2018-02-14", 
-      "location": "[resourceGroup().location]"
+      "location": "[parameters('location')]"
     }, 
     {
-      "name": "[concat(parameters('keyVaultName'), '/', variables('vault').tokenName)]", 
+      "name": "[concat(variables('vault').name, '/', variables('vault').tokenName)]", 
       "tags": {
         "environment": "testing", 
         "parent": "[parameters('vmssName')]"
       }, 
       "dependsOn": [
-        "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('vault').name)]"
       ], 
       "type": "Microsoft.KeyVault/vaults/secrets", 
       "properties": {
         "value": "[parameters('vaultSecretTokenValue')]"
       }, 
-      "apiVersion": "2015-06-01"
+      "apiVersion": "2018-02-14"
     }, 
     {
-      "name": "[concat(parameters('keyVaultName'), '/', variables('vault').instancesNumberName)]", 
+      "name": "[concat(variables('vault').name, '/', variables('vault').instancesNumberName)]", 
       "tags": {
         "environment": "testing", 
         "parent": "[parameters('vmssName')]"
       }, 
       "dependsOn": [
-        "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('vault').name)]"
       ], 
       "type": "Microsoft.KeyVault/vaults/secrets", 
       "properties": {
         "value": "[parameters('vaultSecretInstancesNumberValue')]"
       }, 
-      "apiVersion": "2015-06-01"
+      "apiVersion": "2018-02-14"
     }, 
     {
-      "name": "[concat(parameters('keyVaultName'), '/', variables('vault').proxyProtocolName)]", 
+      "name": "[concat(variables('vault').name, '/', variables('vault').proxyProtocolName)]", 
       "tags": {
         "environment": "testing", 
         "parent": "[parameters('vmssName')]"
       }, 
       "dependsOn": [
-        "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('vault').name)]"
       ], 
       "type": "Microsoft.KeyVault/vaults/secrets", 
       "properties": {
         "value": "[parameters('vaultSecretNetworkProxyProtocol')]"
       }, 
-      "apiVersion": "2015-06-01"
+      "apiVersion": "2018-02-14"
     }, 
     {
-      "name": "[concat(parameters('keyVaultName'), '/', variables('vault').proxyHostName)]", 
+      "name": "[concat(variables('vault').name, '/', variables('vault').proxyHostName)]", 
       "tags": {
         "environment": "testing", 
         "parent": "[parameters('vmssName')]"
       }, 
       "dependsOn": [
-        "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('vault').name)]"
       ], 
       "type": "Microsoft.KeyVault/vaults/secrets", 
       "properties": {
         "value": "[parameters('vaultSecretNetworkProxyHost')]"
       }, 
-      "apiVersion": "2015-06-01"
+      "apiVersion": "2018-02-14"
     }, 
     {
-      "name": "[concat(parameters('keyVaultName'), '/', variables('vault').proxyPortName)]", 
+      "name": "[concat(variables('vault').name, '/', variables('vault').proxyPortName)]", 
       "tags": {
         "environment": "testing", 
         "parent": "[parameters('vmssName')]"
       }, 
       "dependsOn": [
-        "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('vault').name)]"
       ], 
       "type": "Microsoft.KeyVault/vaults/secrets", 
       "properties": {
         "value": "[parameters('vaultSecretNetworkProxyPort')]"
       }, 
-      "apiVersion": "2015-06-01"
+      "apiVersion": "2018-02-14"
     }, 
     {
-      "name": "[concat(parameters('keyVaultName'), '/', variables('vault').proxyUserName)]", 
+      "name": "[concat(variables('vault').name, '/', variables('vault').proxyUserName)]", 
       "tags": {
         "environment": "testing", 
         "parent": "[parameters('vmssName')]"
       }, 
       "dependsOn": [
-        "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('vault').name)]"
       ], 
       "type": "Microsoft.KeyVault/vaults/secrets", 
       "properties": {
         "value": "[parameters('vaultSecretNetworkProxyUser')]"
       }, 
-      "apiVersion": "2015-06-01"
+      "apiVersion": "2018-02-14"
     }, 
     {
-      "name": "[concat(parameters('keyVaultName'), '/', variables('vault').proxyPasswordName)]", 
+      "name": "[concat(variables('vault').name, '/', variables('vault').proxyPasswordName)]", 
       "tags": {
         "environment": "testing", 
         "parent": "[parameters('vmssName')]"
       }, 
       "dependsOn": [
-        "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('vault').name)]"
       ], 
       "type": "Microsoft.KeyVault/vaults/secrets", 
       "properties": {
         "value": "[parameters('vaultSecretNetworkProxyPassword')]"
       }, 
-      "apiVersion": "2015-06-01"
+      "apiVersion": "2018-02-14"
+    }, 
+    {
+      "name": "[concat(variables('vault').name, '/', variables('vault').wsAuthUserName)]", 
+      "tags": {
+        "environment": "testing", 
+        "parent": "[parameters('vmssName')]"
+      }, 
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('vault').name)]"
+      ], 
+      "type": "Microsoft.KeyVault/vaults/secrets", 
+      "properties": {
+        "value": "[parameters('vaultSecretWSAuthUser')]"
+      }, 
+      "apiVersion": "2018-02-14"
+    }, 
+    {
+      "name": "[concat(variables('vault').name, '/', variables('vault').wsAuthPasswordName)]", 
+      "tags": {
+        "environment": "testing", 
+        "parent": "[parameters('vmssName')]"
+      }, 
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('vault').name)]"
+      ], 
+      "type": "Microsoft.KeyVault/vaults/secrets", 
+      "properties": {
+        "value": "[parameters('vaultSecretWSAuthPassword')]"
+      }, 
+      "apiVersion": "2018-02-14"
     }
   ]
 }
